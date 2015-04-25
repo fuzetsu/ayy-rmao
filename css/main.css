@@ -1,0 +1,80 @@
+body {
+  font-family: arial;
+  text-align: center;
+  color: white;
+  background: #222;
+}
+
+.output > div {
+  margin: 5px auto 15px auto;
+}
+
+.output img,
+.output video {
+  max-width: 99%;
+}
+
+.help {
+  font-size: .8em;
+}
+
+.controls button {
+  width: 70px;
+  height: 30px;
+}
+
+.self {
+  width: 750px;
+  max-width: 80%;
+  text-align: left;
+  color: black;
+  background-color: white;
+  border-radius: 15px;
+  box-shadow: 5px 5px 10px rgba(50, 50, 50, 0.75);
+  word-wrap: break-word;
+  margin: auto;
+}
+
+.self > .username {
+  font-weight: bold;
+  position: relative;
+  top: 8px;
+  left: 13px;
+}
+
+.title {
+  font-style: italic;
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+
+.title a {
+  text-decoration: none;
+  color: inherit;
+}
+
+.title a:hover {
+  text-decoration: underline;
+}
+
+.embed {
+  height: 90vh;
+  width: 90%;
+}
+
+.output .content {
+  padding: 20px 30px 30px 30px;
+}
+
+.center {
+  text-align: center;
+}
+
+.video {
+  opacity: 0.25;
+}
+
+.video:hover {
+  opacity: 1;
+  z-index: 100;
+}
