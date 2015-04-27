@@ -8,16 +8,20 @@ var win = $(window),
   nsfw = false,
   query, lastEl, lastHash,
   posts = [],
+  viewed = [],
   help = $('div.help'),
+  message = $('div.message > p').hide(),
   baseUrl = "http://www.reddit.com";
 
-var MOBILE = isMobile();
+var MOBILE = isMobile(),
+  NUM_LOAD = 5;
 
 form.submit(function(evt) {
   var hash = '';
   query = txtSearch.val();
   output.empty();
   posts = [];
+  viewed = [];
   lastEl = null;
   if (query) {
     if (chkNsfw.prop('checked')) {
@@ -27,9 +31,10 @@ form.submit(function(evt) {
     }
     help.hide();
     controls.show();
+    message.hide();
     hash = 'subreddit is ' + query + ' and nsfw is ' + (nsfw ? 'enabled' : 'disabled');
     txtSearch.blur();
-    loadPosts(5);
+    loadPosts();
   } else {
     help.show();
     controls.hide();
@@ -86,13 +91,22 @@ function pauseOtherVids(vid) {
 
 function handleScroll(evt) {
   if (doc.height() - (win.height() + win.scrollTop()) < win.height()) {
-    loadPosts(5);
+    loadPosts();
   }
 }
 
 function getPosts(subreddit, params) {
   return $.getJSON(baseUrl + '/r/' + subreddit + '.json?limit=100' + (params ? '&' + params : '')).then(function(data) {
-    posts = data.data.children;
+    return $.Deferred(function(deferred) {
+      posts = data.data.children.filter(function(post) {
+        return (nsfw || !post.data.over_18) && viewed.indexOf(post.data.name) === -1;
+      });
+      if (posts.length === 0) {
+        deferred.reject('Nothing Here');
+      } else {
+        deferred.resolve();
+      }
+    }).promise();
   });
 }
 
@@ -127,6 +141,7 @@ function handleGfycat(res) {
 function loadPosts(num) {
   var promise;
   var param = (lastEl ? 'after=' + lastEl : '');
+  num = num || NUM_LOAD;
   if (posts.length === 0) {
     promise = getPosts(query, param);
   }
@@ -134,12 +149,11 @@ function loadPosts(num) {
     var i = 0;
     var post, linkTitle, url, comments, subreddit, title, out;
     for (; i < num; i++) {
-      do {
-        post = posts.shift().data;
-        if (post.over_18 && !nsfw) {
-          post = null;
-        }
-      } while (!post);
+      if (posts.length === 0) {
+        return loadPosts(num - i);
+      }
+      post = posts.shift().data;
+      viewed.push(post.name);
       lastEl = post.name;
       linkTitle = post.title.replace(/"/g, '&quot;');
       url = post.url;
@@ -175,6 +189,10 @@ function loadPosts(num) {
     if (!output.html()) {
       output.append('<div>Nothing on this page...</div>');
     }
+  }).fail(function(e) {
+    console.error(e);
+    message.text(e);
+    message.show();
   });
 }
 

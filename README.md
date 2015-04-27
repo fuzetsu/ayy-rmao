@@ -2,4 +2,6 @@
 
 A simple image driven view of Reddit. [Check it out!](http://fuzetsu.github.com/ayy-rmao).
 
+This is a really old project that I've recently moved to GitHub. The code needs to be totally refactored.
+
 [![Analytics](https://ga-beacon.appspot.com/UA-61974780-1/ayy-rmao/README)](https://github.com/igrigorik/ga-beacon)

@@ -14,7 +14,7 @@ body {
   max-width: 99%;
 }
 
-.help {
+.help, .message {
   font-size: .8em;
 }
 
