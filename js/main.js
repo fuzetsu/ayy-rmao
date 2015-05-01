@@ -168,8 +168,8 @@ function loadPosts(num) {
         out = makePost(title, makeImage(url));
       } else if (/imgur\.com\/[A-z0-9]+([\?#].+)?$/.test(url)) {
         out = makePost(title, makeImage('http://i.imgur.com/' + removeUrlExtras(url).match(/([^\/]+)$/)[0] + '.gif'));
-      } else if (/imgur\.com\/a\/[A-z0-9]+([\?#].+)?$/.test(url)) {
-        out = makePost(title, makeIframe(removeUrlExtras(url) + '/embed'));
+      } else if (/imgur\.com\/(a|gallery)\/[A-z0-9]+([\?#].+)?$/.test(url)) {
+        out = makePost(title, makeIframe(removeUrlExtras(url.replace(/\/gallery\//, '/a/')) + '/embed'));
       } else if (/gfycat\.com\/[A-z0-9]+([\?#].+)?$/.test(url)) {
         var div = document.createElement('div');
         output.append(div);
