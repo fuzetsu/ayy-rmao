@@ -161,7 +161,6 @@ function loadPosts(num) {
       comments = baseUrl + post.permalink;
       subreddit = post.subreddit;
       numComments = post.num_comments;
-      console.log(post);
       title = makeTitle(linkTitle, comments, subreddit, score, numComments);
       if (/\.webm([\?#].+)?$/i.test(url)) {
         out = makePost(title, makeVideo(removeUrlExtras(url), 'webm'));
