@@ -147,7 +147,7 @@ function loadPosts(num) {
   }
   $.when(promise).then(function() {
     var i = 0;
-    var post, linkTitle, url, comments, subreddit, title, out;
+    var post, linkTitle, url, comments, subreddit, title, out, score, numComments;
     for (; i < num; i++) {
       if (posts.length === 0) {
         return loadPosts(num - i);
@@ -157,9 +157,12 @@ function loadPosts(num) {
       lastEl = post.name;
       linkTitle = post.title.replace(/"/g, '&quot;');
       url = post.url;
+      score = post.score;
       comments = baseUrl + post.permalink;
       subreddit = post.subreddit;
-      title = makeTitle(linkTitle, comments, subreddit);
+      numComments = post.num_comments;
+      console.log(post);
+      title = makeTitle(linkTitle, comments, subreddit, score, numComments);
       if (/\.webm([\?#].+)?$/i.test(url)) {
         out = makePost(title, makeVideo(removeUrlExtras(url), 'webm'));
       } else if (/imgur.+\.(gif|gifv)([\?#].+)?$/i.test(url)) {
@@ -200,14 +203,18 @@ function makePost(title, body) {
   return '<div>' + title + body + '</div>';
 }
 
-function makeTitle(title, comments, subreddit) {
+function makeTitle(title, comments, subreddit, score, numComments) {
   return '<div class="title"><a href="' +
     comments +
     '" target="_blank" title="' +
     subreddit +
     '">' +
     title +
-    '</a></div>';
+    '</a></div><div class="info"><span class="score">' +
+    score +
+    '</span> points and <span class="num-comments">' +
+    numComments +
+    '</span> comments</div>';
 }
 
 function makeImage(src) {
