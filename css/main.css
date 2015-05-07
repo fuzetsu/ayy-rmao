@@ -5,6 +5,11 @@ body {
   background: #222;
 }
 
+.sr-form > * {
+  display: block;
+  margin: 0 auto 5px auto;
+}
+
 .output > div {
   margin: 5px auto 15px auto;
 }
