@@ -2,6 +2,13 @@
 
 A simple image driven view of Reddit. [Check it out!](http://fuzetsu.github.com/ayy-rmao).
 
-This is a really old project that I've recently moved to GitHub. The code needs to be totally refactored.
+## TODO
+
+- [x] convert app to mithril.js
+- [ ] add some animations (maybe)
+- [ ] better handling of imgur urls
+- [ ] better memory management (lazy loading / unloading off viewport)
+- [ ] style more attractively
+- [ ] follow better standards with mithril app code
 
 [![Analytics](https://ga-beacon.appspot.com/UA-61974780-1/ayy-rmao/README)](https://github.com/igrigorik/ga-beacon)
