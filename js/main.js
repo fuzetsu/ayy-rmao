@@ -147,13 +147,13 @@
   };
 
   var PostItem = {
-    controller: function(args) {
-      if(args.post.load) args.post.load(args.post.data);
-    },
     view: function(ctrl, args) {
       var post = args.post;
       var comp = pl[post.type];
-      console.log('loading', post);
+      if(post.load) {
+        post.load(post.data);
+        post.load = null;
+      }
       return m('.post', [
         m('.title', [
           m('a[target=_blank]', { href: API_URL + post.data.permalink, title: post.data.subreddit }, post.data.title),
