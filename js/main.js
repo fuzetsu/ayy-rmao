@@ -25,7 +25,7 @@
       return data.data.children.filter(function(post) {
         return (nsfw || !post.data.over_18) && app.state.viewed.indexOf(post.data.name) === -1;
       }).map(function(post) {
-        app.state.viewed.push(post.name);
+        app.state.viewed.push(post.data.name);
         return detectPostType(post.data);
       });
     });
@@ -110,7 +110,7 @@
     { type: 'Embed', match: /imgur\.com\/(a|gallery)\/[a-z0-9]+$/i, parse: function(url) {
       return url.replace(/\/gallery\//, '/a/') + '/embed';
     }},
-    { type: 'Video', match: /gfycat\.com\/[a-z0-9]+$/i, load: function(post) {
+    { type: 'Video', match: /gfycat\.com\/[a-z0-9]+$/i, strip: true, load: function(post) {
       return m.request({
         method: 'GET',
         url: 'http://gfycat.com/cajax/get/' + post.url.match(/gfycat\.com\/([a-z0-9]+)$/i)[1]
@@ -128,7 +128,7 @@
 
   // iterates through post types looking for a match for the given url
   var detectPostType = function(post) {
-    var url = post.url.replace(/[\?#].+$/, '');
+    var url = post.url.replace(/[\?#].*$/, '');
     var ret = {};
     postTypes.some(function(type) {
       if((typeof type.match === 'function' ? type.match(post) : type.match.test(url))) {
@@ -138,7 +138,8 @@
         baseAttrs.concat(type.fields || []).forEach(function(field) {
           ret.data[field] = post[field];
         });
-        ret.data.url = type.parse ? type.parse(url) : post.url;
+        ret.key = ret.data.name;
+        ret.data.url = type.parse ? type.parse(url) : (type.strip ? url : post.url);
         return true;
       }
     });
@@ -147,15 +148,12 @@
 
   var PostItem = {
     controller: function(args) {
-      this.post = m.prop(args.post || {});
+      if(args.post.load) args.post.load(args.post.data);
     },
     view: function(ctrl, args) {
-      var post = ctrl.post();
+      var post = args.post;
       var comp = pl[post.type];
-      if(post.load && !post.loaded) {
-        post.loaded = true;
-        post.load(post.data);
-      }
+      console.log('loading', post);
       return m('.post', [
         m('.title', [
           m('a[target=_blank]', { href: API_URL + post.data.permalink, title: post.data.subreddit }, post.data.title),
@@ -171,12 +169,8 @@
   };
 
   var PostList = {
-    controller: function(args) {
-      // the posts to load
-      this.posts = args.posts;
-    },
     view: function(ctrl, args) {
-      var posts = ctrl.posts().slice(0, app.state.limit).map(function(post) {
+      var posts = args.posts().slice(0, app.state.limit).map(function(post) {
         return m.component(PostItem, { post: post });
       });
       return m('.post-list', (posts.length > 0 ? posts : [
@@ -189,14 +183,14 @@
 
   window.addEventListener('scroll', function(e) {
     if(document.body.clientHeight - (window.innerHeight + document.body.scrollTop) < window.innerHeight) {
-      app.state.limit += 5;
+      app.state.limit += app.state.load_num;
       m.redraw();
     }
   });
 
   // APP
 
-  app.state = { limit: 5, viewed: [] };
+  app.state = { load_num: 3, limit: 3, viewed: [] };
 
   app.controller = function() {
     // running list of posts
@@ -216,8 +210,8 @@
     this.loadPosts = function(e) {
       e.preventDefault();
       app.state.viewed.length = 0;
-      app.state.limit = 5;
-      Post.list(this.subreddit(), '', this.nsfw()).then(this.noteAfter).then(this.posts);
+      app.state.limit = app.state.load_num;
+      this.posts = Post.list(this.subreddit(), '', this.nsfw()).then(this.noteAfter);
     }.bind(this);
   };
 
