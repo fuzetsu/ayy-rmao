@@ -10,12 +10,12 @@ body {
   margin: 0 auto 5px auto;
 }
 
-.output > div {
+.post-list > div {
   margin: 5px auto 15px auto;
 }
 
-.output img,
-.output video {
+.post-list img,
+.post-list video {
   max-width: 99%;
 }
 
@@ -23,12 +23,7 @@ body {
   font-size: .8em;
 }
 
-.controls button {
-  width: 70px;
-  height: 30px;
-}
-
-.self {
+.self-post {
   width: 750px;
   max-width: 80%;
   text-align: left;
@@ -40,7 +35,7 @@ body {
   margin: auto;
 }
 
-.self > .username {
+.self-post > .username {
   font-weight: bold;
   position: relative;
   top: 8px;
@@ -67,7 +62,7 @@ body {
   width: 90%;
 }
 
-.output .content {
+.post-list .content {
   padding: 20px 30px 30px 30px;
 }
 
