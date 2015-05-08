@@ -211,7 +211,11 @@
       e.preventDefault();
       app.state.viewed.length = 0;
       app.state.limit = app.state.load_num;
-      this.posts = Post.list(this.subreddit(), '', this.nsfw()).then(this.noteAfter);
+      if(this.subreddit()) {
+        this.posts = Post.list(this.subreddit(), '', this.nsfw()).then(this.noteAfter);
+      } else {
+        this.posts = m.prop([]);
+      }
     }.bind(this);
   };
 

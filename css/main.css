@@ -10,6 +10,10 @@ body {
   margin: 0 auto 5px auto;
 }
 
+.sr-form input[type=text] {
+  text-align: center;
+}
+
 .post-list > div {
   margin: 5px auto 15px auto;
 }
