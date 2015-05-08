@@ -99,7 +99,7 @@
 
   // array of post types, how to match, and how to display them
   var postTypes = [
-    { type: 'video', match: /\.webm$/i },
+    { type: 'Video', match: /\.webm$/i },
     { type: 'Video', match: /imgur.+\.(gif|gifv)$/i, parse: function(url) {
       return url.replace(/\.[^\.]+$/, '.webm');
     }},
