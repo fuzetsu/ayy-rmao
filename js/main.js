@@ -15,6 +15,18 @@
       var e = document.createElement('div');
       e.innerHTML = input;
       return e.childNodes.length === 0 ? "" : e.childNodes[0].nodeValue;
+    },
+    throttle: function(limit, callback) {
+      var wait = false;
+      return function() {
+        if (!wait) {
+          callback();
+          wait = true;
+          setTimeout(function() {
+            wait = false;
+          }, limit);
+        }
+      };
     }
   };
 
@@ -78,7 +90,7 @@
     view: function(ctrl, args) {
       return m('.self-post', [
         m('.username', args.author + ' says: '),
-        m('.content', m.trust(util.htmlDecode(args.selftext_html)))
+        m('.content', args.selftext_html ? m.trust(util.htmlDecode(args.selftext_html)) : args.title)
       ]);
     }
   };
@@ -201,12 +213,12 @@
 
   // GLOBAL EVENTS
 
-  window.addEventListener('scroll', function(e) {
+  window.addEventListener('scroll', util.throttle(100, function(e) {
     if(document.body.clientHeight - (window.innerHeight + document.body.scrollTop) < window.innerHeight) {
       app.state.limit += app.state.load_num;
       m.redraw();
     }
-  });
+  }));
 
   // APP
 
