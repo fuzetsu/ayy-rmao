@@ -9,6 +9,6 @@ A simple image driven view of Reddit. [Check it out!](http://fuzetsu.github.com/
 - [ ] better handling of imgur urls
 - [ ] better memory management (lazy loading / unloading off viewport)
 - [ ] style more attractively
-- [ ] follow better standards with mithril app code
+- [x] follow better standards with mithril app code
 
 [![Analytics](https://ga-beacon.appspot.com/UA-61974780-1/ayy-rmao/README)](https://github.com/igrigorik/ga-beacon)
