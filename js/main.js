@@ -80,9 +80,12 @@
   };
 
   pl.Embed = {
+    controller: function(args) {
+      this.loaded = m.prop(false);
+    },
     view: function(ctrl, args) {
       return m('.embed-post', [
-        m('iframe.embed[frameborder=0]', { src: args.url })
+        ctrl.loaded() ? m('iframe.embed[frameborder=0]', { src: args.url }) : m('button.load-embed', { onclick: ctrl.loaded.bind(null, true) }, 'Load ' + (args.desc || 'Embedded Content'))
       ]);
     }
   };
@@ -141,7 +144,7 @@
     { type: 'Image', match: /imgur\.com\/[a-z0-9]+$/i, parse: function(url) {
       return 'http://i.imgur.com/' + url.match(/([^\/]+)$/)[0] + '.gif';
     }},
-    { type: 'Embed', match: /imgur\.com\/(a|gallery)\/[a-z0-9]+$/i, parse: function(url) {
+    { type: 'Embed', desc: 'Imgur Gallery', match: /imgur\.com\/(a|gallery)\/[a-z0-9]+$/i, parse: function(url) {
       return url.replace(/\/gallery\//, '/a/') + '/embed';
     }},
     { type: 'Video', match: /gfycat\.com\/[a-z0-9]+$/i, strip: true, parseAsync: function(url) {
@@ -174,6 +177,7 @@
           ret.data[field] = post[field];
         });
         ret.key = ret.data.name;
+        ret.data.desc = type.desc;
         ret.data.url = type.parse ? type.parse(url) : (type.strip ? url : post.url);
         return true;
       }

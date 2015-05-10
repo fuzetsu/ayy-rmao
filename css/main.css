@@ -102,3 +102,8 @@ body {
 .num-comments {
   color: rgb(0, 167, 228);
 }
+
+.load-embed {
+  padding: 10px 15px;
+  margin: 7px 0;
+}
