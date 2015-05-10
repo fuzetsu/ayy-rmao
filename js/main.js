@@ -305,7 +305,7 @@
     return [
       m('h1.header', 'Ayy Rmao'),
       m('form.sr-form', { onsubmit: ctrl.handleSubmit }, [
-        m('input[type=text][placeholder=subreddit][autofocus]', { onchange: m.withAttr('value', ctrl.subreddit), value: ctrl.subreddit() }),
+        m('input[type=text][placeholder=subreddit]', { onchange: m.withAttr('value', ctrl.subreddit), value: ctrl.subreddit(), autofocus: !ctrl.subreddit() }),
         m('label', [
           m('input[type=checkbox]', { onclick: m.withAttr('checked', ctrl.nsfw), checked: ctrl.nsfw() }),
           m('span', 'nsfw?')
