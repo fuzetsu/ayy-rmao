@@ -27,6 +27,10 @@ body {
   font-size: .8em;
 }
 
+.loading-post {
+  padding: 0 50px 0 50px;
+}
+
 .self-post {
   width: 750px;
   max-width: 80%;

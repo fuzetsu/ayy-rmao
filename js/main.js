@@ -4,6 +4,10 @@
 
   var API_URL = 'http://www.reddit.com';
 
+  var IMAGES = {
+    loading: 'img/loading.gif'
+  };
+
   // UTIL
 
   var util = {
@@ -94,6 +98,23 @@
     }
   };
 
+  pl.Loading = {
+    controller: function(args) {
+      if(args.post.parseAsync) {
+        args.post.parseAsync(args.post.data.url).then(function(url) {
+          args.post.parseAsync = null;
+          args.post.data.url = url;
+          m.redraw();
+        });
+      }
+    },
+    view: function(ctrl, args) {
+      return m('.loading', [
+        m('img', { src: IMAGES.loading })
+      ]);
+    }
+  };
+
   // the base list of attributes to copy
   var baseAttrs = ['name', 'permalink', 'subreddit', 'score', 'num_comments', 'title'];
 
@@ -110,12 +131,13 @@
     { type: 'Embed', match: /imgur\.com\/(a|gallery)\/[a-z0-9]+$/i, parse: function(url) {
       return url.replace(/\/gallery\//, '/a/') + '/embed';
     }},
-    { type: 'Video', match: /gfycat\.com\/[a-z0-9]+$/i, strip: true, load: function(post) {
+    { type: 'Video', match: /gfycat\.com\/[a-z0-9]+$/i, strip: true, parseAsync: function(url) {
       return m.request({
         method: 'GET',
-        url: 'http://gfycat.com/cajax/get/' + post.url.match(/gfycat\.com\/([a-z0-9]+)$/i)[1]
+        url: 'http://gfycat.com/cajax/get/' + url.match(/gfycat\.com\/([a-z0-9]+)$/i)[1],
+        background: true
       }).then(function(data) {
-        post.url = data.gfyItem.webmUrl;
+        return data.gfyItem.webmUrl;
       });
     }},
     { type: 'Self', match: function(post) {
@@ -134,7 +156,7 @@
       if((typeof type.match === 'function' ? type.match(post) : type.match.test(url))) {
         ret.data = {};
         ret.type = type.type;
-        ret.load = type.load;
+        ret.parseAsync = type.parseAsync;
         baseAttrs.concat(type.fields || []).forEach(function(field) {
           ret.data[field] = post[field];
         });
@@ -150,10 +172,6 @@
     view: function(ctrl, args) {
       var post = args.post;
       var comp = pl[post.type];
-      if(post.load) {
-        post.load(post.data);
-        post.load = null;
-      }
       return m('.post', [
         m('.title', [
           m('a[target=_blank]', { href: API_URL + post.data.permalink, title: post.data.subreddit }, post.data.title),
@@ -163,7 +181,9 @@
           ' points and ',
           m('span.num-comments', post.data.num_comments)
         ]),
-        m.component(comp, post.data)
+        post.parseAsync ? m.component(pl.Loading, { post: post }) : (
+          m.component(comp, post.data)
+        )
       ]);
     }
   };
