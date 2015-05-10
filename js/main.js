@@ -36,7 +36,8 @@
   Post.list = function(subreddit, after, nsfw) {
     return m.request({
       method: 'GET',
-      url: API_URL + '/r/' + subreddit + '.json?limit=100&after=' + after
+      url: API_URL + '/r/' + subreddit + '.json?limit=' + app.const.REQUEST_NUM + '&after=' + after,
+      background: true
     }).then(function(data) {
       return data.data.children.filter(function(post) {
         return (nsfw || !post.data.over_18) && app.state.viewed.indexOf(post.data.name) === -1;
@@ -112,7 +113,7 @@
 
   pl.Loading = {
     controller: function(args) {
-      if(args.post.parseAsync) {
+      if(args.post && args.post.parseAsync) {
         args.post.parseAsync(args.post.data.url).then(function(url) {
           args.post.parseAsync = null;
           args.post.data.url = url;
@@ -206,7 +207,7 @@
         return m.component(PostItem, { post: post });
       });
       return m('.post-list', (posts.length > 0 ? posts : [
-        m('p.message', 'Nothing Here...')
+        m('p.message', args.message || 'Nothing here...')
       ]));
     }
   };
@@ -215,14 +216,23 @@
 
   window.addEventListener('scroll', util.throttle(100, function(e) {
     if(document.body.clientHeight - (window.innerHeight + document.body.scrollTop) < window.innerHeight) {
-      app.state.limit += app.state.load_num;
+      app.state.limit += app.const.LOAD_NUM;
       m.redraw();
     }
   }));
 
   // APP
 
-  app.state = { load_num: 3, limit: 3, viewed: [] };
+  app.const = {
+    LOAD_NUM: 3,
+    ADD_MORE_THRESHOLD: 10,
+    REQUEST_NUM: 25
+  };
+
+  app.state = {
+    limit: 3,
+    viewed: []
+  };
 
   app.controller = function() {
     // running list of posts
@@ -233,35 +243,67 @@
     this.after = m.prop('');
     // whether or not to allow nsfw posts
     this.nsfw = m.prop(false);
+    // the subreddit currently showing
+    this.showing = m.prop('');
+    // whether we're currently loading
+    this.loading = m.prop(false);
 
     this.noteAfter = function(posts) {
       if(posts.length > 0) this.after(posts[posts.length - 1].data.name);
       return posts;
     }.bind(this);
 
-    this.loadPosts = function(e) {
-      e.preventDefault();
+    this.resetPosts = function() {
+      this.posts = m.prop([]);
+      this.after('');
       app.state.viewed.length = 0;
-      app.state.limit = app.state.load_num;
+      app.state.limit = app.const.LOAD_NUM;
+    }.bind(this);
+
+    this.appendPosts = function(posts) {
+      this.posts(this.posts().concat(posts));
+      return posts;
+    }.bind(this);
+
+    this.handleSubmit = function(e) {
+      e.preventDefault();
+      if(this.subreddit() !== this.showing()) {
+        this.loadPosts();
+      }
+    }.bind(this);
+
+    this.loadPosts = function() {
       if(this.subreddit()) {
-        this.posts = Post.list(this.subreddit(), '', this.nsfw()).then(this.noteAfter);
+        if(this.subreddit() !== this.showing()) {
+          this.resetPosts();
+          this.loading(true);
+        }
+        this.showing(this.subreddit());
+        Post.list(this.subreddit(), this.after(), this.nsfw())
+          .then(this.noteAfter)
+          .then(this.appendPosts)
+          .then(this.loading.bind(null, false))
+          .then(m.redraw);
       } else {
-        this.posts = m.prop([]);
+        this.resetPosts();
       }
     }.bind(this);
   };
 
   app.view = function(ctrl, args) {
+    if(!ctrl.loading() && ctrl.posts().length <= app.state.limit + app.const.ADD_MORE_THRESHOLD) {
+      ctrl.loadPosts();
+    }
     return [
       m('h1.header', 'Ayy Rmao'),
-      m('form.sr-form', { onsubmit: ctrl.loadPosts }, [
-        m('input[type=text][placeholder=subreddit]', { onchange: m.withAttr('value', ctrl.subreddit), value: ctrl.subreddit() }),
+      m('form.sr-form', { onsubmit: ctrl.handleSubmit }, [
+        m('input[type=text][placeholder=subreddit][autofocus]', { onchange: m.withAttr('value', ctrl.subreddit), value: ctrl.subreddit() }),
         m('label', [
           m('input[type=checkbox]', { onclick: m.withAttr('checked', ctrl.nsfw), checked: ctrl.nsfw() }),
           m('span', 'nsfw?')
         ])
       ]),
-      m.component(PostList, { posts: ctrl.posts })
+      ctrl.loading() ? m.component(pl.Loading, {}) : m.component(PostList, { posts: ctrl.posts, message: ctrl.subreddit() ? '' : 'Please enter a subreddit and press enter.'  })
     ];
   };
 
