@@ -244,7 +244,10 @@
     // whether or not to allow nsfw posts
     this.nsfw = m.prop(false);
     // the subreddit currently showing
-    this.showing = m.prop('');
+    this.cur = {
+      subreddit: m.prop(''),
+      nsfw: m.prop(false)
+    };
     // whether we're currently loading
     this.loading = m.prop(false);
 
@@ -267,18 +270,23 @@
 
     this.handleSubmit = function(e) {
       e.preventDefault();
-      if(this.subreddit() !== this.showing()) {
+      if(this.somethingChanged()) {
         this.loadPosts();
       }
     }.bind(this);
 
+    this.somethingChanged = function() {
+      return this.subreddit() !== this.cur.subreddit() || this.nsfw() !== this.cur.nsfw();
+    }.bind(this);
+
     this.loadPosts = function() {
       if(this.subreddit()) {
-        if(this.subreddit() !== this.showing()) {
+        if(this.somethingChanged()) {
           this.resetPosts();
           this.loading(true);
         }
-        this.showing(this.subreddit());
+        this.cur.subreddit(this.subreddit());
+        this.cur.nsfw(this.nsfw());
         Post.list(this.subreddit(), this.after(), this.nsfw())
           .then(this.noteAfter)
           .then(this.appendPosts)
@@ -291,7 +299,7 @@
   };
 
   app.view = function(ctrl, args) {
-    if(!ctrl.loading() && ctrl.posts().length <= app.state.limit + app.const.ADD_MORE_THRESHOLD) {
+    if(!ctrl.loading() && ctrl.posts().length > 0 && ctrl.posts().length <= app.state.limit + app.const.ADD_MORE_THRESHOLD) {
       ctrl.loadPosts();
     }
     return [
