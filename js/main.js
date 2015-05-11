@@ -44,13 +44,15 @@
       var target = e.target;
       var titled = util.titleCase(type);
       var style = target.style;
+      var viewport = window['inner' + titled];
       var orig = (target['natural' + titled] || target['video' + titled] || '');
+      var cur = target['client' + titled];
       var dim = style[type];
-      if(!dim && orig === target['client' + titled]) {
+      if(!dim && (orig === cur || orig * 0.8 <= cur)) {
         dim = orig + '';
       }
       if (dim) {
-        if (dim.indexOf(orig) > -1) {
+        if (dim.indexOf(orig) > -1 && orig <= viewport * 0.99) {
           style[type] = (orig * 1.75) + 'px';
           style.maxHeight = 'none';
         } else {
