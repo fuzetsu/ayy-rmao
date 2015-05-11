@@ -51,7 +51,7 @@
       }
       if (dim) {
         if (dim.indexOf(orig) > -1) {
-          style[type] = '95v' + type.charAt(0);
+          style[type] = (orig * 1.75) + 'px';
           style.maxHeight = 'none';
         } else {
           style[type] = '';
