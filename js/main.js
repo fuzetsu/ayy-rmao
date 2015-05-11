@@ -41,12 +41,24 @@
   // common actions
   var ex = {
     toggleExpand: function(type, e) {
-      var style = e.target.style;
-      if(style[type]) {
-        style[type] = '';
-        style.maxHeight = '';
+      var target = e.target;
+      var titled = util.titleCase(type);
+      var style = target.style;
+      var orig = (target['natural' + titled] || target['video' + titled] || '');
+      var dim = style[type];
+      if(!dim && orig === target['client' + titled]) {
+        dim = orig + '';
+      }
+      if (dim) {
+        if (dim.indexOf(orig) > -1) {
+          style[type] = '95v' + type.charAt(0);
+          style.maxHeight = 'none';
+        } else {
+          style[type] = '';
+          style.maxHeight = '';
+        }
       } else {
-        style[type] = '95v' + type.charAt(0);
+        style[type] = orig + 'px';
         style.maxHeight = 'none';
       }
     }
