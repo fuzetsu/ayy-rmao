@@ -21,6 +21,7 @@ body {
 .post-list img,
 .post-list video {
   max-width: 99%;
+  max-height: 95vh;
 }
 
 .help, .message {
