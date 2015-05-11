@@ -11,6 +11,9 @@
   // UTIL
 
   var util = {
+    id: function(id) {
+      return document.getElementById(id);
+    },
     htmlDecode: function(input) {
       var e = document.createElement('div');
       e.innerHTML = input;
@@ -225,6 +228,15 @@
     }
   }));
 
+  window.addEventListener('hashchange', function() {
+    if(!app.state.changingHash) {
+      m.mount(app.mountElem, null);
+      m.mount(app.mountElem, app);
+    } else {
+      app.state.changingHash = false;
+    }
+  });
+
   // APP
 
   app.const = {
@@ -235,7 +247,8 @@
 
   app.state = {
     limit: 3,
-    viewed: []
+    viewed: [],
+    changingHash: false
   };
 
   app.controller = function() {
@@ -263,6 +276,8 @@
     this.resetPosts = function() {
       this.posts = m.prop([]);
       this.after('');
+      this.cur.nsfw(false);
+      this.cur.subreddit('');
       app.state.viewed.length = 0;
       app.state.limit = app.const.LOAD_NUM;
     }.bind(this);
@@ -279,6 +294,35 @@
       }
     }.bind(this);
 
+    this.writeState = function() {
+      this.cur.subreddit(this.subreddit());
+      this.cur.nsfw(this.nsfw());
+      this.setHash('subreddit is ' + this.cur.subreddit() + ' and nsfw is ' + this.cur.nsfw());
+    }.bind(this);
+
+    this.readState = function() {
+      if(location.hash) {
+        var state = {};
+        location.hash.slice(1).split(' and ').forEach(function(thing) {
+          var pair = thing.split(' is ');
+          state[pair[0]] = pair[1];
+        });
+        if('subreddit' in state) {
+          this.subreddit(state.subreddit);
+        }
+        if('nsfw' in state) {
+          this.nsfw(state.nsfw === 'true');
+        }
+        return true;
+      }
+      return false;
+    }.bind(this);
+
+    this.setHash = function(hash) {
+      app.state.changingHash = true;
+      location.hash = hash;
+    }.bind(this);
+
     this.somethingChanged = function() {
       return this.subreddit() !== this.cur.subreddit() || this.nsfw() !== this.cur.nsfw();
     }.bind(this);
@@ -289,17 +333,22 @@
           this.resetPosts();
           this.loading(true);
         }
-        this.cur.subreddit(this.subreddit());
-        this.cur.nsfw(this.nsfw());
+        this.writeState();
         Post.list(this.subreddit(), this.after(), this.nsfw())
           .then(this.noteAfter)
           .then(this.appendPosts)
           .then(this.loading.bind(null, false))
           .then(m.redraw);
       } else {
+        this.setHash('');
         this.resetPosts();
       }
     }.bind(this);
+
+    if(this.readState()) {
+      this.loadPosts();
+    }
+
   };
 
   app.view = function(ctrl, args) {
@@ -319,6 +368,8 @@
     ];
   };
 
-  m.mount(document.getElementById('app'), app);
+  app.mountElem = util.id('app');
+
+  m.mount(app.mountElem, app);
 
 }());
