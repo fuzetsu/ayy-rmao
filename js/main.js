@@ -14,6 +14,11 @@
     id: function(id) {
       return document.getElementById(id);
     },
+    titleCase: function(str) {
+      return str.replace(/([a-z]+)/gi, function(match) {
+        return match.charAt(0).toUpperCase() + match.slice(1);
+      });
+    },
     htmlDecode: function(input) {
       var e = document.createElement('div');
       e.innerHTML = input;
@@ -30,6 +35,20 @@
           }, limit);
         }
       };
+    }
+  };
+
+  // common actions
+  var ex = {
+    toggleExpand: function(type, e) {
+      var style = e.target.style;
+      if(style[type]) {
+        style[type] = '';
+        style.maxHeight = '';
+      } else {
+        style[type] = '95v' + type.charAt(0);
+        style.maxHeight = 'none';
+      }
     }
   };
 
@@ -64,10 +83,11 @@
       this.pause = function(e) {
         e.target.pause();
       };
+      this.toggleExpand = ex.toggleExpand.bind(null, 'height');
     },
     view: function(ctrl, args) {
       return m('.video-post', [
-        m('video.video[loop][preload=metadata]', { onmouseenter: ctrl.play, onmouseleave: ctrl.pause }, [
+        m('video.video[loop][preload=metadata]', { onmouseenter: ctrl.play, onmouseleave: ctrl.pause, onclick: ctrl.toggleExpand }, [
           m('source[type=video/webm]', { src: args.url })
         ])
       ]);
@@ -75,9 +95,12 @@
   };
 
   pl.Image = {
+    controller: function(args) {
+      this.toggleExpand = ex.toggleExpand.bind(null, 'width');
+    },
     view: function(ctrl, args) {
       return m('.image-post', [
-        m('img', { src: args.url })
+        m('img', { src: args.url, onclick: ctrl.toggleExpand })
       ]);
     }
   };
