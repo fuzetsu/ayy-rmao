@@ -240,6 +240,7 @@
   // APP
 
   app.const = {
+    FIRST_LOAD_NUM: 7,
     LOAD_NUM: 3,
     ADD_MORE_THRESHOLD: 10,
     REQUEST_NUM: 25
@@ -279,7 +280,7 @@
       this.cur.nsfw(false);
       this.cur.subreddit('');
       app.state.viewed.length = 0;
-      app.state.limit = app.const.LOAD_NUM;
+      app.state.limit = app.const.FIRST_LOAD_NUM;
     }.bind(this);
 
     this.appendPosts = function(posts) {
@@ -297,7 +298,7 @@
     this.writeState = function() {
       this.cur.subreddit(this.subreddit());
       this.cur.nsfw(this.nsfw());
-      this.setHash('subreddit is ' + this.cur.subreddit() + ' and nsfw is ' + this.cur.nsfw());
+      this.setHash('subreddit is ' + this.cur.subreddit() + ' and nsfw is ' + (this.cur.nsfw() ? 'enabled' : 'disabled'));
     }.bind(this);
 
     this.readState = function() {
@@ -311,7 +312,7 @@
           this.subreddit(state.subreddit);
         }
         if('nsfw' in state) {
-          this.nsfw(state.nsfw === 'true');
+          this.nsfw(state.nsfw === 'enabled');
         }
         return true;
       }
