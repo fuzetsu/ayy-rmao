@@ -231,7 +231,7 @@
       var comp = pl[post.type];
       return m('.post', [
         m('.title', [
-          m('a[target=_blank]', { href: API_URL + post.data.permalink, title: post.data.subreddit }, post.data.title),
+          m('a[target=_blank]', { href: API_URL + post.data.permalink, title: post.data.subreddit }, m.trust(post.data.title)),
         ]),
         m('.info', [
           m('span.score', post.data.score),
