@@ -304,6 +304,8 @@
     this.after = m.prop('');
     // whether or not to allow nsfw posts
     this.nsfw = m.prop(false);
+    // whether loading failed
+    this.failed = m.prop(false);
     // the subreddit currently showing
     this.cur = {
       subreddit: m.prop(''),
@@ -377,15 +379,30 @@
           this.resetPosts();
           this.loading(true);
         }
+        this.failed(false);
         this.writeState();
         Post.list(this.subreddit(), this.after(), this.nsfw())
           .then(this.noteAfter)
           .then(this.appendPosts)
           .then(this.loading.bind(null, false))
-          .then(m.redraw);
+          .then(m.redraw, this.handleError);
       } else {
         this.setHash('');
         this.resetPosts();
+      }
+    }.bind(this);
+
+    this.handleError = function(e) {
+      this.loading(false);
+      this.failed(true);
+      m.redraw();
+    }.bind(this);
+
+    this.getMessage = function() {
+      if(this.failed()) {
+        return 'Failed to load subreddit. Please check name and try again.';
+      } else if(!this.subreddit()) {
+        return 'Please enter a subreddit and press enter.';
       }
     }.bind(this);
 
@@ -408,7 +425,7 @@
           m('span', 'nsfw?')
         ])
       ]),
-      ctrl.loading() ? m.component(pl.Loading, {}) : m.component(PostList, { posts: ctrl.posts, message: ctrl.subreddit() ? '' : 'Please enter a subreddit and press enter.'  })
+      ctrl.loading() ? m.component(pl.Loading, {}) : m.component(PostList, { posts: ctrl.posts, message: ctrl.getMessage() })
     ];
   };
 
