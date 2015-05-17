@@ -2,7 +2,7 @@
 
   var app = {};
 
-  var API_URL = 'http://www.reddit.com';
+  var API_URL = 'https://www.reddit.com';
 
   var IMAGES = {
     loading: 'img/loading.gif'
