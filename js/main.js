@@ -40,6 +40,7 @@
     withAttrNoRedraw: function(attr, prop) {
       return m.withAttr(attr, function(value) {
         m.redraw.strategy('none');
+        console.log(value);
         prop(value);
       });
     }
@@ -98,13 +99,17 @@
 
   pl.Video = {
     controller: function(args) {
-      this.play = function(e) {
+      var play = function(e) {
         e.target.play();
       };
-      this.pause = function(e) {
+      var pause = function(e) {
         e.target.pause();
       };
-      this.toggleExpand = ex.toggleExpand.bind(null, 'height');
+      return {
+        toggleExpand: ex.toggleExpand.bind(null, 'height'),
+        play: play,
+        pause: pause,
+      };
     },
     view: function(ctrl, args) {
       return m('.video-post', [
@@ -117,7 +122,9 @@
 
   pl.Image = {
     controller: function(args) {
-      this.toggleExpand = ex.toggleExpand.bind(null, 'width');
+      return {
+        toggleExpand: ex.toggleExpand.bind(null, 'width')
+      };
     },
     view: function(ctrl, args) {
       return m('.image-post', [
@@ -128,7 +135,9 @@
 
   pl.Embed = {
     controller: function(args) {
-      this.loaded = m.prop(false);
+      return {
+        loaded: m.prop(false)
+      };
     },
     view: function(ctrl, args) {
       var url = args.url;
@@ -303,56 +312,50 @@
 
   app.controller = function() {
     // running list of posts
-    this.posts = m.prop([]);
+    var posts = m.prop([]);
     // the subreddit to load
-    this.subreddit = m.prop('');
+    var subreddit = m.prop('');
     // starting point for post loading
-    this.after = m.prop('');
+    var after = m.prop('');
     // whether or not to allow nsfw posts
-    this.nsfw = m.prop(false);
+    var nsfw = m.prop(false);
     // whether loading failed
-    this.failed = m.prop(false);
+    var failed = m.prop(false);
     // the subreddit currently showing
-    this.cur = {
+    var cur = {
       subreddit: m.prop(''),
       nsfw: m.prop(false)
     };
     // whether we're currently loading
-    this.loading = m.prop(false);
+    var loading = m.prop(false);
 
-    this.noteAfter = function(posts) {
-      if(posts.length > 0) this.after(posts[posts.length - 1].data.name);
-      return posts;
-    }.bind(this);
+    // -- START PRIVATE
+    var noteAfter = function(newPosts) {
+      if(newPosts.length > 0) after(newPosts[newPosts.length - 1].data.name);
+      return newPosts;
+    };
 
-    this.resetPosts = function() {
-      this.posts = m.prop([]);
-      this.after('');
-      this.cur.nsfw(false);
-      this.cur.subreddit('');
+    var resetPosts = function() {
+      posts([]);
+      after('');
+      cur.nsfw(false);
+      cur.subreddit('');
       app.state.viewed.length = 0;
       app.state.limit = app.const.FIRST_LOAD_NUM;
-    }.bind(this);
+    };
 
-    this.appendPosts = function(posts) {
-      this.posts(this.posts().concat(posts));
-      return posts;
-    }.bind(this);
+    var appendPosts = function(newPosts) {
+      posts(posts().concat(newPosts));
+      return newPosts;
+    };
 
-    this.handleSubmit = function(e) {
-      e.preventDefault();
-      if(this.somethingChanged()) {
-        this.loadPosts();
-      }
-    }.bind(this);
+    var writeState = function() {
+      cur.subreddit(subreddit());
+      cur.nsfw(nsfw());
+      setHash('subreddit is ' + cur.subreddit() + ' and nsfw is ' + (cur.nsfw() ? 'enabled' : 'disabled'));
+    };
 
-    this.writeState = function() {
-      this.cur.subreddit(this.subreddit());
-      this.cur.nsfw(this.nsfw());
-      this.setHash('subreddit is ' + this.cur.subreddit() + ' and nsfw is ' + (this.cur.nsfw() ? 'enabled' : 'disabled'));
-    }.bind(this);
-
-    this.readState = function() {
+    var readState = function() {
       if(location.hash) {
         var state = {};
         location.hash.slice(1).split(' and ').forEach(function(thing) {
@@ -360,61 +363,84 @@
           state[pair[0]] = pair[1];
         });
         if('subreddit' in state) {
-          this.subreddit(state.subreddit);
+          subreddit(state.subreddit);
         }
         if('nsfw' in state) {
-          this.nsfw(state.nsfw === 'enabled');
+          nsfw(state.nsfw === 'enabled');
         }
         return true;
       }
       return false;
-    }.bind(this);
+    };
 
-    this.setHash = function(hash) {
+    var setHash = function(hash) {
       app.state.changingHash = true;
       location.hash = hash;
-    }.bind(this);
+    };
 
-    this.somethingChanged = function() {
-      return this.subreddit() !== this.cur.subreddit() || this.nsfw() !== this.cur.nsfw();
-    }.bind(this);
+    var somethingChanged = function() {
+      return subreddit() !== cur.subreddit() || nsfw() !== cur.nsfw();
+    };
 
-    this.loadPosts = function() {
-      if(this.subreddit()) {
-        if(this.somethingChanged()) {
-          this.resetPosts();
-          this.loading(true);
-        }
-        this.failed(false);
-        this.writeState();
-        Post.list(this.subreddit(), this.after(), this.nsfw())
-          .then(this.noteAfter)
-          .then(this.appendPosts)
-          .then(this.loading.bind(null, false))
-          .then(m.redraw, this.handleError);
-      } else {
-        this.setHash('');
-        this.resetPosts();
-      }
-    }.bind(this);
-
-    this.handleError = function(e) {
-      this.loading(false);
-      this.failed(true);
+    var handleError = function(e) {
+      loading(false);
+      failed(true);
       m.redraw();
-    }.bind(this);
+    };
+    // -- END PRIVATE
 
-    this.getMessage = function() {
-      if(this.failed()) {
+    // -- START PUBLIC
+    var handleSubmit = function(e) {
+      e.preventDefault();
+      if(somethingChanged()) {
+        loadPosts();
+      }
+    };
+
+    var loadPosts = function() {
+      if(subreddit()) {
+        if(somethingChanged()) {
+          resetPosts();
+          loading(true);
+        }
+        failed(false);
+        writeState();
+        Post.list(subreddit(), after(), nsfw())
+          .then(noteAfter)
+          .then(appendPosts)
+          .then(loading.bind(null, false))
+          .then(m.redraw, handleError);
+      } else {
+        setHash('');
+        resetPosts();
+      }
+    };
+
+    var getMessage = function() {
+      if(failed()) {
         return 'Failed to load subreddit. Please check name and try again.';
-      } else if(!this.subreddit()) {
+      } else if(!subreddit()) {
         return 'Please enter a subreddit and press enter.';
       }
-    }.bind(this);
+    };
+    // -- END PUBLIC
 
-    if(this.readState()) {
-      this.loadPosts();
+    // read hash and load posts if appropriate
+    if(readState()) {
+      loadPosts();
     }
+
+    return {
+      // props
+      loading: loading,
+      posts: posts,
+      subreddit: subreddit,
+      nsfw: nsfw,
+      // funcs
+      getMessage: getMessage,
+      loadPosts: loadPosts,
+      handleSubmit: handleSubmit,
+    };
 
   };
 
