@@ -1,3 +1,4 @@
+/*global m */
 (function() {
 
   var app = {};
@@ -130,8 +131,13 @@
       this.loaded = m.prop(false);
     },
     view: function(ctrl, args) {
+      var url = args.url;
+      var protocol = args.url.slice(0, args.url.indexOf(':') + 1);
+      if(location.protocol === 'https:') {
+        url = url.replace(protocol, location.protocol);
+      }
       return m('.embed-post', [
-        ctrl.loaded() ? m('iframe.embed[frameborder=0]', { src: args.url }) : m('button.load-embed', { onclick: ctrl.loaded.bind(null, true) }, 'Load ' + (args.desc || 'Embedded Content'))
+        ctrl.loaded() ? m('iframe.embed[frameborder=0]', { src: url }) : m('button.load-embed', { onclick: ctrl.loaded.bind(null, true) }, 'Load ' + (args.desc || 'Embedded Content'))
       ]);
     }
   };
