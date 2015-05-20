@@ -40,7 +40,6 @@
     withAttrNoRedraw: function(attr, prop) {
       return m.withAttr(attr, function(value) {
         m.redraw.strategy('none');
-        console.log(value);
         prop(value);
       });
     }
@@ -112,9 +111,10 @@
       };
     },
     view: function(ctrl, args) {
+      var post = args.post;
       return m('.video-post', [
         m('video.video[loop][preload=metadata]', { onmouseenter: ctrl.play, onmouseleave: ctrl.pause, onclick: ctrl.toggleExpand }, [
-          m('source[type=video/webm]', { src: args.url })
+          m('source[type=video/webm]', { src: post.url })
         ])
       ]);
     }
@@ -127,8 +127,9 @@
       };
     },
     view: function(ctrl, args) {
+      var post = args.post;
       return m('.image-post', [
-        m('img', { src: args.url, onclick: ctrl.toggleExpand })
+        m('img', { src: post.url, onclick: ctrl.toggleExpand })
       ]);
     }
   };
@@ -140,35 +141,37 @@
       };
     },
     view: function(ctrl, args) {
-      var url = args.url;
-      var protocol = args.url.slice(0, args.url.indexOf(':') + 1);
+      var post = args.post;
+      var url = post.url;
       if(location.protocol === 'https:') {
-        url = url.replace(protocol, location.protocol);
+        url = url.replace(/^.+:/, location.protocol);
       }
       return m('.embed-post', [
-        ctrl.loaded() ? m('iframe.embed[frameborder=0]', { src: url }) : m('button.load-embed', { onclick: ctrl.loaded.bind(null, true) }, 'Load ' + (args.desc || 'Embedded Content'))
+        ctrl.loaded() ? m('iframe.embed[frameborder=0]', { src: url }) : m('button.load-embed', { onclick: ctrl.loaded.bind(null, true) }, 'Load ' + (post.desc || 'Embedded Content'))
       ]);
     }
   };
 
   pl.Self = {
     view: function(ctrl, args) {
+      var post = args.post;
       return m('.self-post', [
-        m('.username', args.author + ' says: '),
-        m('.content', args.selftext_html ? m.trust(util.htmlDecode(args.selftext_html)) : args.title)
+        m('.username', post.author + ' says: '),
+        m('.content', post.selftext_html ? m.trust(util.htmlDecode(post.selftext_html)) : post.title)
       ]);
     }
   };
 
   pl.Link = {
     view: function(ctrl, args) {
+      var post = args.post;
       return m('.link-post.self-post', [
-        m('.username', args.author + ' says: '),
+        m('.username', post.author + ' says: '),
         m('.content', [
           m('.center', [
-            m('a[target=_blank]', { href: args.url }, args.url),
+            m('a[target=_blank]', { href: post.url }, post.url),
             m('br'),
-            m('img', { src: args.thumbnail })
+            m('img', { src: post.thumbnail })
           ])
         ])
       ]);
@@ -178,9 +181,9 @@
   pl.Loading = {
     controller: function(args) {
       if(args.post && args.post.parseAsync) {
-        args.post.parseAsync(args.post.data.url).then(function(url) {
+        args.post.parseAsync(args.post.url).then(function(url) {
           args.post.parseAsync = null;
-          args.post.data.url = url;
+          args.post.url = url;
           m.redraw();
         });
       }
@@ -228,22 +231,20 @@
   // iterates through post types looking for a match for the given url
   var detectPostType = function(post) {
     var url = post.url.replace(/[\?#].*$/, '');
-    var ret = {};
+    var npost = {};
     postTypes.some(function(type) {
       if((typeof type.match === 'function' ? type.match(post) : type.match.test(url))) {
-        ret.data = {};
-        ret.type = type.type;
-        ret.parseAsync = type.parseAsync;
         baseAttrs.concat(type.fields || []).forEach(function(field) {
-          ret.data[field] = post[field];
+          npost[field] = post[field];
         });
-        ret.key = ret.data.name;
-        ret.data.desc = type.desc;
-        ret.data.url = type.parse ? type.parse(url) : (type.strip ? url : post.url);
+        ['type', 'parseAsync', 'desc'].forEach(function(field) {
+          npost[field] = type[field];
+        });
+        npost.url = type.parse ? type.parse(url) : (type.strip ? url : post.url);
         return true;
       }
     });
-    return ret;
+    return npost;
   };
 
   var PostItem = {
@@ -252,15 +253,15 @@
       var comp = pl[post.type];
       return m('.post', [
         m('.title', [
-          m('a[target=_blank]', { href: API_URL + post.data.permalink, title: post.data.subreddit }, m.trust(post.data.title)),
+          m('a[target=_blank]', { href: API_URL + post.permalink, title: post.subreddit }, m.trust(post.title)),
         ]),
         m('.info', [
-          m('span.score', post.data.score),
+          m('span.score', post.score),
           ' points and ',
-          m('span.num-comments', post.data.num_comments)
+          m('span.num-comments', post.num_comments)
         ]),
         post.parseAsync ? m.component(pl.Loading, { post: post }) : (
-          m.component(comp, post.data)
+          m.component(comp, { post: post })
         )
       ]);
     }
@@ -280,7 +281,9 @@
   // GLOBAL EVENTS
 
   window.addEventListener('scroll', util.throttle(100, function(e) {
-    if(document.body.clientHeight - (window.innerHeight + document.body.scrollTop) < window.innerHeight) {
+    var scrollTop = (document.documentElement || document.body).scrollTop;
+    if(document.body.clientHeight - (window.innerHeight + scrollTop) < window.innerHeight) {
+      console.log('loading more');
       app.state.limit += app.const.LOAD_NUM;
       m.redraw();
     }
@@ -331,7 +334,7 @@
 
     // -- START PRIVATE
     var noteAfter = function(newPosts) {
-      if(newPosts.length > 0) after(newPosts[newPosts.length - 1].data.name);
+      if(newPosts.length > 0) after(newPosts[newPosts.length - 1].name);
       return newPosts;
     };
 
