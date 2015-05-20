@@ -281,9 +281,8 @@
   // GLOBAL EVENTS
 
   window.addEventListener('scroll', util.throttle(100, function(e) {
-    var scrollTop = (document.documentElement || document.body).scrollTop;
+    var scrollTop = Math.max(document.documentElement.scrollTop, document.body.scrollTop);
     if(document.body.clientHeight - (window.innerHeight + scrollTop) < window.innerHeight) {
-      console.log('loading more');
       app.state.limit += app.const.LOAD_NUM;
       m.redraw();
     }
