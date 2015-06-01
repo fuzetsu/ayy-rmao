@@ -258,7 +258,8 @@
         m('.info', [
           m('span.score', post.score),
           ' points and ',
-          m('span.num-comments', post.num_comments)
+          m('span.num-comments', post.num_comments),
+          ' comments'
         ]),
         post.parseAsync ? m.component(pl.Loading, { post: post }) : (
           m.component(comp, { post: post })
