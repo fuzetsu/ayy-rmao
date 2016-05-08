@@ -116,3 +116,7 @@ body {
   padding: 10px 15px;
   margin: 7px 0;
 }
+
+.hidden {
+  display: none;
+}

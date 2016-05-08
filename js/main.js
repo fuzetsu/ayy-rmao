@@ -261,8 +261,8 @@
           m('span.num-comments', post.num_comments),
           ' comments'
         ]),
-        post.parseAsync ? m.component(pl.Loading, { post: post }) : (
-          m.component(comp, { post: post })
+        post.parseAsync ? m(pl.Loading, { post: post }) : (
+          m(comp, { post: post })
         )
       ]);
     }
@@ -271,7 +271,7 @@
   var PostList = {
     view: function(ctrl, args) {
       var posts = args.posts().slice(0, app.state.limit).map(function(post) {
-        return m.component(PostItem, { post: post });
+        return m(PostItem, { post: post });
       });
       return m('.post-list', (posts.length > 0 ? posts : [
         m('p.message', args.message || 'Nothing here...')
@@ -314,10 +314,14 @@
   };
 
   app.controller = function() {
+    // localstorage key used to store filter
+    var fKey = 'ayy-rmao-filter';
     // running list of posts
     var posts = m.prop([]);
     // the subreddit to load
     var subreddit = m.prop('');
+    // subreddits to filter out from results
+    var filter = m.prop(localStorage[fKey] || '');
     // starting point for post loading
     var after = m.prop('');
     // whether or not to allow nsfw posts
@@ -327,7 +331,8 @@
     // the subreddit currently showing
     var cur = {
       subreddit: m.prop(''),
-      nsfw: m.prop(false)
+      nsfw: m.prop(false),
+      filter: m.prop(filter())
     };
     // whether we're currently loading
     var loading = m.prop(false);
@@ -343,6 +348,7 @@
       after('');
       cur.nsfw(false);
       cur.subreddit('');
+      cur.filter(localStorage[fKey] || '');
       app.state.viewed.length = 0;
       app.state.limit = app.const.FIRST_LOAD_NUM;
     };
@@ -355,7 +361,9 @@
     var writeState = function() {
       cur.subreddit(subreddit());
       cur.nsfw(nsfw());
-      setHash('subreddit is ' + cur.subreddit() + ' and nsfw is ' + (cur.nsfw() ? 'enabled' : 'disabled'));
+      cur.filter(filter());
+      localStorage[fKey] = filter();
+      setHash('subreddit is ' + cur.subreddit() + (cur.filter() ? ' and filter is ' + cur.filter() : '') + ' and nsfw is ' + (cur.nsfw() ? 'enabled' : 'disabled'));
     };
 
     var readState = function() {
@@ -371,6 +379,10 @@
         if('nsfw' in state) {
           nsfw(state.nsfw === 'enabled');
         }
+        if('filter' in state) {
+          localStorage[fKey] = state.filter;
+          filter(state.filter);
+        }
         return true;
       }
       return false;
@@ -382,13 +394,21 @@
     };
 
     var somethingChanged = function() {
-      return subreddit() !== cur.subreddit() || nsfw() !== cur.nsfw();
+      return subreddit() !== cur.subreddit() || nsfw() !== cur.nsfw() || filter() !== cur.filter();
     };
 
     var handleError = function(e) {
       loading(false);
       failed(true);
       m.redraw();
+    };
+
+    var applyFilter = function(posts) {
+      if(!filter()) return posts;
+      var filtered = filter().split('+');
+      return posts.filter(function(post) {
+        return filtered.indexOf(post.subreddit) === -1;
+      });
     };
     // -- END PRIVATE
 
@@ -409,6 +429,7 @@
         failed(false);
         writeState();
         Post.list(subreddit(), after(), nsfw())
+          .then(applyFilter)
           .then(noteAfter)
           .then(appendPosts)
           .then(loading.bind(null, false))
@@ -438,6 +459,7 @@
       loading: loading,
       posts: posts,
       subreddit: subreddit,
+      filter: filter,
       nsfw: nsfw,
       // funcs
       getMessage: getMessage,
@@ -455,12 +477,14 @@
       m('h1.header', 'Ayy Rmao'),
       m('form.sr-form', { onsubmit: ctrl.handleSubmit }, [
         m('input[type=text][placeholder=subreddit]', { onchange: util.withAttrNoRedraw('value', ctrl.subreddit), value: ctrl.subreddit(), autofocus: !ctrl.subreddit() }),
+        m('input[type=text][placeholder=filter]', { onchange: util.withAttrNoRedraw('value', ctrl.filter), value: ctrl.filter() }),
         m('label', [
           m('input[type=checkbox]', { onclick: util.withAttrNoRedraw('checked', ctrl.nsfw), checked: ctrl.nsfw() }),
           m('span', 'nsfw?')
-        ])
+        ]),
+        m('button[type=submit].hidden')
       ]),
-      ctrl.loading() ? m.component(pl.Loading, {}) : m.component(PostList, { posts: ctrl.posts, message: ctrl.getMessage() })
+      ctrl.loading() ? m(pl.Loading, {}) : m(PostList, { posts: ctrl.posts, message: ctrl.getMessage() })
     ];
   };
 
