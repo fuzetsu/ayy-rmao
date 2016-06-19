@@ -5,7 +5,7 @@
 
   var API_URL = 'https://www.reddit.com';
 
-  var IMAGES = {
+  var IMAGES = {  
     loading: 'img/loading.gif'
   };
 
@@ -114,7 +114,7 @@
       var post = args.post;
       return m('.video-post', [
         m('video.video[loop][preload=metadata]', { onmouseenter: ctrl.play, onmouseleave: ctrl.pause, onclick: ctrl.toggleExpand }, [
-          m('source[type=video/webm]', { src: post.url })
+          m('source[type=video/mp4]', { src: post.url })
         ])
       ]);
     }
@@ -202,7 +202,7 @@
   var postTypes = [
     { type: 'Video', match: /\.webm$/i },
     { type: 'Video', match: /imgur.+\.(gif|gifv)$/i, parse: function(url) {
-      return url.replace(/\.[^\.]+$/, '.webm');
+      return url.replace(/\.[^\.]+$/, '.mp4');
     }},
     { type: 'Image', match: /\.(jpg|png|gif)$/i },
     { type: 'Image', match: /imgur\.com\/[a-z0-9]+$/i, parse: function(url) {
