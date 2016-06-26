@@ -1,4 +1,4 @@
-/*global m */
+/*global m,location,localStorage */
 (function() {
 
   var app = {};
@@ -42,6 +42,11 @@
         m.redraw.strategy('none');
         prop(value);
       });
+    },
+    deferredProp: function(value) {
+      var prop = m.deferred();
+      prop.resolve(value);
+      return prop.promise;
     }
   };
 
@@ -181,7 +186,7 @@
   pl.Loading = {
     controller: function(args) {
       if(args.post && args.post.parseAsync) {
-        args.post.parseAsync(args.post.url).then(function(url) {
+        args.post.parseAsync(args.post.url, args.post).then(function(url) {
           args.post.parseAsync = null;
           args.post.url = url;
           m.redraw();
@@ -204,7 +209,26 @@
     { type: 'Video', match: /imgur.+\.(gif|gifv)$/i, parse: function(url) {
       return url.replace(/\.[^\.]+$/, '.mp4');
     }},
-    { type: 'Image', match: /\.(jpg|png|gif)$/i },
+    { type: 'Image', match: /reddituploads/i, strip: false, parse: function(url) {
+      return url.replace(/&amp;/gi, '&');
+    }}, 
+    { type: 'Image', match: /\.(jpg|png|gif)$/i, /*parseAsync: function(url, post) {
+      if(url.indexOf('imgur.com') < 0) return util.deferredProp(url);
+      return m.request({
+        method: 'HEAD',
+        url: url,
+        background: true,
+        deserialize: function(value) { return value; },
+        extract: function(xhr) { return xhr.getResponseHeader('Content-Type'); }
+      }).then(function(type) {
+        if(type !== 'image/gif') return url;
+        console.log('avoided giant gif :)');
+        post.type = 'Video';
+        return url.replace(/\.[^\.]+$/, '.mp4');
+      }, function() {
+        return url;
+      });
+    }*/},
     { type: 'Image', match: /imgur\.com\/[a-z0-9]+$/i, parse: function(url) {
       return 'http://i.imgur.com/' + url.match(/([^\/]+)$/)[0] + '.gif';
     }},
@@ -240,7 +264,7 @@
         ['type', 'parseAsync', 'desc'].forEach(function(field) {
           npost[field] = type[field];
         });
-        npost.url = type.parse ? type.parse(url) : (type.strip ? url : post.url);
+        npost.url = type.parse ? type.parse(type.strip === false ? post.url : url) : (type.strip ? url : post.url);
         return true;
       }
     });
