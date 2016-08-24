@@ -233,7 +233,7 @@
       return 'http://i.imgur.com/' + url.match(/([^\/]+)$/)[0] + '.gif';
     }},
     { type: 'Embed', desc: 'Imgur Gallery', match: /imgur\.com\/(a|gallery)\/[a-z0-9]+$/i, parse: function(url) {
-      return url.replace(/\/gallery\//, '/a/') + '/embed';
+      return url.replace(/\/gallery\//, '/a/').replace(/^http:/, 'https:') + '/embed';
     }},
     { type: 'Video', match: /gfycat\.com\/[a-z0-9]+$/i, strip: true, parseAsync: function(url) {
       return m.request({
