@@ -112,6 +112,10 @@ body {
   color: rgb(0, 167, 228);
 }
 
+.sub-name {
+  color: #ff5b5b;
+}
+
 .load-embed {
   padding: 10px 15px;
   margin: 7px 0;
