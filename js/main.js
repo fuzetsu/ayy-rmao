@@ -285,7 +285,14 @@
           ' points and ',
           m('span.num-comments', post.num_comments),
           ' comments on ',
-          m('span.sub-name', post.subreddit)
+          m('span.sub-name', [
+            m('a', {
+              href: `#subreddit is ${post.subreddit} and nsfw is ${app.state.nsfw() ? 'enabled' : 'disabled'}`,
+              onclick: e => {
+                if(e.button === 0) setTimeout(() => location.reload(), 200);
+              }
+            }, post.subreddit)
+          ])
         ]),
         post.parseAsync ? m(pl.Loading, { post: post }) : (
           m(comp, { post: post })
@@ -317,8 +324,9 @@
 
   window.addEventListener('hashchange', function() {
     if(!app.state.changingHash) {
-      m.mount(app.mountElem, null);
-      m.mount(app.mountElem, app);
+      location.reload();
+      // m.mount(app.mountElem, null);
+      // m.mount(app.mountElem, app);
     } else {
       app.state.changingHash = false;
     }
@@ -330,28 +338,30 @@
     FIRST_LOAD_NUM: 7,
     LOAD_NUM: 3,
     ADD_MORE_THRESHOLD: 10,
-    REQUEST_NUM: 25
+    REQUEST_NUM: 25,
+    FKEY: 'ayy-rmao-filter',
   };
 
   app.state = {
     limit: 3,
     viewed: [],
-    changingHash: false
+    changingHash: false,
+    subreddit: m.prop(''),
+    nsfw: m.prop(false),
+    filter: m.prop(localStorage[app.const.FKEY] || ''),
   };
 
   app.controller = function() {
-    // localstorage key used to store filter
-    var fKey = 'ayy-rmao-filter';
+    // the subreddit to load
+    var subreddit = app.state.subreddit;
+    // subreddits to filter out from results
+    var filter = app.state.filter;
+    // whether or not to allow nsfw posts
+    var nsfw = app.state.nsfw;
     // running list of posts
     var posts = m.prop([]);
-    // the subreddit to load
-    var subreddit = m.prop('');
-    // subreddits to filter out from results
-    var filter = m.prop(localStorage[fKey] || '');
     // starting point for post loading
     var after = m.prop('');
-    // whether or not to allow nsfw posts
-    var nsfw = m.prop(false);
     // whether loading failed
     var failed = m.prop(false);
     // the subreddit currently showing
@@ -374,7 +384,7 @@
       after('');
       cur.nsfw(false);
       cur.subreddit('');
-      cur.filter(localStorage[fKey] || '');
+      cur.filter(localStorage[app.const.FKEY] || '');
       app.state.viewed.length = 0;
       app.state.limit = app.const.FIRST_LOAD_NUM;
     };
@@ -388,7 +398,7 @@
       cur.subreddit(subreddit());
       cur.nsfw(nsfw());
       cur.filter(filter());
-      localStorage[fKey] = filter();
+      localStorage[app.const.FKEY] = filter();
       setHash('subreddit is ' + cur.subreddit() + (cur.filter() ? ' and filter is ' + cur.filter() : '') + ' and nsfw is ' + (cur.nsfw() ? 'enabled' : 'disabled'));
     };
 
@@ -406,7 +416,7 @@
           nsfw(state.nsfw === 'enabled');
         }
         if('filter' in state) {
-          localStorage[fKey] = state.filter;
+          localStorage[app.const.FKEY] = state.filter;
           filter(state.filter);
         }
         return true;
@@ -415,8 +425,12 @@
     };
 
     var setHash = function(hash) {
+      clearInterval(app.state.timeoutId);
       app.state.changingHash = true;
       location.hash = hash;
+      app.state.timeoutId = setTimeout(() => {
+        app.state.changingHash = false;
+      }, 500);
     };
 
     var somethingChanged = function() {
