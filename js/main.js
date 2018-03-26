@@ -403,9 +403,10 @@
     };
 
     var readState = function() {
-      if(location.hash) {
+      var hash = decodeURIComponent(location.hash);
+      if(hash) {
         var state = {};
-        location.hash.slice(1).split(' and ').forEach(function(thing) {
+        hash.slice(1).split(' and ').forEach(function(thing) {
           var pair = thing.split(' is ');
           state[pair[0]] = pair[1];
         });
