@@ -241,9 +241,7 @@
       return url.replace(/\/gallery\//, '/a/').replace(/^http:/, 'https:') + '/embed?pub=true&analytics=false';
     }},
     { type: 'Video', match: /gfycat\.com\/[a-z0-9]+$/i, strip: true, parseAsync: function(url) {
-      return m.request({
-        method: 'GET',
-        dataType: 'jsonp',
+      return m.jsonp({
         url: 'http://gfycat.com/cajax/get/' + url.match(/gfycat\.com\/([a-z0-9]+)$/i)[1],
         background: true
       }).then(function(data) {
