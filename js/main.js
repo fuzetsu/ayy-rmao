@@ -47,6 +47,35 @@
       var prop = m.deferred();
       prop.resolve(value);
       return prop.promise;
+    },
+    pluralize: function(word, count) {
+      return count !== 1 ? word + 's' : word;
+    },
+    genColor: function(numOfSteps, step) {
+      // This function generates vibrant, "evenly spaced" colours (i.e. no clustering). This is ideal for creating easily distinguishable vibrant markers in Google Maps and other apps.
+      // Adam Cole, 2011-Sept-14
+      // HSV to RBG adapted from: http://mjijackson.com/2008/02/rgb-to-hsl-and-rgb-to-hsv-color-model-conversion-algorithms-in-javascript
+      var r, g, b;
+      var h = step / numOfSteps;
+      var i = ~~(h * 6);
+      var f = h * 6 - i;
+      var q = 1 - f;
+      switch (i % 6) {
+        case 0:
+          r = 1;g = f;b = 0;break;
+        case 1:
+          r = q;g = 1;b = 0;break;
+        case 2:
+          r = 0;g = 1;b = f;break;
+        case 3:
+          r = 0;g = q;b = 1;break;
+        case 4:
+          r = f;g = 0;b = 1;break;
+        case 5:
+          r = 1;g = 0;b = q;break;
+      }
+      var c = "#" + ("00" + (~~(r * 255)).toString(16)).slice(-2) + ("00" + (~~(g * 255)).toString(16)).slice(-2) + ("00" + (~~(b * 255)).toString(16)).slice(-2);
+      return (c);
     }
   };
 
@@ -93,6 +122,17 @@
         app.state.viewed.push(post.data.name);
         return detectPostType(post.data);
       });
+    });
+  };
+  
+  var Comments = function() {};
+  Comments.list = function(post) {
+    return m.request({
+      method: 'GET',
+      url: API_URL + post.permalink + '.json',
+      background: true
+    }).then(function(data) {
+      return data[1].data.children;
     });
   };
 
@@ -212,23 +252,7 @@
     { type: 'Image', match: /reddituploads/i, strip: false, parse: function(url) {
       return url.replace(/&amp;/gi, '&');
     }}, 
-    { type: 'Image', match: /\.(jpg|png|gif)$/i, /*parseAsync: function(url, post) {
-      if(url.indexOf('imgur.com') < 0) return util.deferredProp(url);
-      return m.request({
-        method: 'HEAD',
-        url: url,
-        background: true,
-        deserialize: function(value) { return value; },
-        extract: function(xhr) { return xhr.getResponseHeader('Content-Type'); }
-      }).then(function(type) {
-        if(type !== 'image/gif') return url;
-        console.log('avoided giant gif :)');
-        post.type = 'Video';
-        return url.replace(/\.[^\.]+$/, '.mp4');
-      }, function() {
-        return url;
-      });
-    }*/},
+    { type: 'Image', match: /\.(jpg|png|gif)$/i},
     { type: 'Image', match: /imgur\.com\/[a-z0-9]+$/i, parse: function(url) {
       return 'http://i.imgur.com/' + url.match(/([^\/]+)$/)[0] + '.gif';
     }},
@@ -278,7 +302,15 @@
       var comp = pl[post.type];
       return m('.post', [
         m('.title', [
-          m('a[target=_blank]', { href: API_URL + post.permalink, title: post.subreddit }, m.trust(post.title)),
+          m('a[target=_blank]', { 
+            href: API_URL + post.permalink,
+            title: post.subreddit,
+            onclick: function(e) {
+              if(e.ctrlKey) return;
+              e.preventDefault();
+              app.state.openPost = post;
+            }
+          }, m.trust(post.title)),
         ]),
         m('.info', [
           m('span.score', post.score),
@@ -302,6 +334,166 @@
       return m('.post-list', (posts.length > 0 ? posts : [
         m('p.message', args.message || 'Nothing here...')
       ]));
+    }
+  };
+  
+  var Modal = {
+    view: function(ctrl, args) {
+      return m('div.overlay', {
+        onclick: e => {
+          if(args.onclose && e.target.classList.contains('overlay')) args.onclose();
+        }
+      }, m('div.modal', [
+        m('div.modal-header', [
+          m('div.modal-header-content', args.header),
+          m('div.modal-header-actions', [
+            m('span.modal-close', {
+              onclick: function(e) {
+                args.onclose && args.onclose();
+              }
+            }, m.trust('&times;'))
+          ])
+        ]),
+        m('div.modal-body', args.content)
+      ]));
+    }
+  };
+  
+  var PostCommentsModal = {
+    controller: function(args) {
+      let ctrl = {
+        post: app.state.openPost,
+        onclose: () => app.state.openPost = null,
+      };
+      return ctrl;
+    },
+    view: function(ctrl, args) {
+      return m(Modal, {
+        onclose: ctrl.onclose,
+        header: [
+          m('a[target=_blank]', { href: API_URL + ctrl.post.permalink }, 'Comments: '),
+          m.trust(ctrl.post.title)
+        ],
+        content: m(PostComments, { post: ctrl.post })
+      });
+    }
+  };
+  
+  var PostComments = {
+    controller: function(args) {
+      var comments = m.prop([]);
+      var loading = m.prop(true);
+      Comments.list(args.post)
+        .then(comments)
+        .then(loading.bind(null, false))
+        .then(m.redraw)
+      return {
+        loading: loading,
+        comments: comments
+      };
+    },
+    view: function(ctrl, args) {
+      return m('div.post-comments', [
+        ctrl.loading() ? m('div.center', m(pl.Loading, {})) : '',
+        m('div.post-comments-list', ctrl.comments().map((c, idx, arr) => {
+          if(c.kind === 'more') return m(LoadMoreComments, { parentArray: arr, moreComments: c.data });
+          return m(PostComment, {comment: c.data });
+        }))
+      ]);
+    }
+  };
+  
+  var LoadMoreComments = {
+    controller(args) {
+      return {
+        loading: m.prop(false)
+      };
+    },
+    view(ctrl, args) {
+      if(ctrl.loading()) return m(pl.Loading, {});
+      let mc = args.moreComments;
+      return m('a.btn-load-more-comments[href=#]', {
+        onclick: e => {
+          e.preventDefault();
+          ctrl.loading(true);
+          m.request({
+            method: 'GET',
+            url: API_URL + '/api/morechildren.json',
+            data: {
+              api_type: 'json',
+              children: mc.children.join(','),
+              link_id: app.state.openPost.name
+            }
+          }).then(data => {
+            ctrl.loading(false);
+            console.log(data);
+            if(!data || !data.json || !data.json.data || !data.json.data.things || data.json.data.things.length <= 0) {
+              console.log('didnt get more comments to load :(', data && data.json && data.json.errors);
+              return;
+            }
+            // remove load more button
+            args.parentArray.some((c, idx) => {
+              if(c.kind === 'more' && c.data.id === mc.id) {
+                args.parentArray.splice(idx, 1);
+                return true;
+              }
+            });
+            // add in new comments
+            let lastCommentAtDepth = {};
+            data.json.data.things.forEach(cmt => {
+              if(cmt.data.depth === mc.depth) {
+                args.parentArray.push(cmt);
+              } else {
+                let parentComment = lastCommentAtDepth[cmt.data.depth - 1];
+                if(!parentComment) return;
+                parentComment.data.replies = parentComment.data.replies || {
+                  kind: "Listing",
+                  data: {
+                    children: []
+                  }
+                };
+                parentComment.data.replies.data.children.push(cmt);
+              }
+              lastCommentAtDepth[cmt.data.depth] = cmt;
+            });
+          }, err => console.log(err));
+        }
+      }, 'Load ', mc.count, ' more ', util.pluralize('comment', mc.count), '.');
+    }
+  };
+  
+  var _borderColor = {};
+  var PostComment = {
+    view: function(ctrl, args) {
+      let cmt = args.comment;
+      let createdAt = new Date(cmt.created * 1000);
+      let editedAt = cmt.edited && new Date(cmt.edited * 1000);
+      let borderColor = _borderColor[cmt.depth];
+      if(!borderColor) {
+        borderColor = util.genColor(12, cmt.depth);
+        _borderColor[cmt.depth] = borderColor;
+      }
+      return m('div.post-comment', {
+        style: `border-left-color: ${borderColor};`
+      }, [
+        m('div.post-comment-info', [
+          m('strong.post-comment-collapse', {
+            onclick: e => cmt.collapsed = !cmt.collapsed
+          }, '[', cmt.collapsed ? '+' : '-', '] '),
+          m('span.post-comment-author', cmt.author), ', ',
+          m('span.score', cmt.score), ' points, posted: ',
+          createdAt.toLocaleString(),
+          editedAt ? [', edited: ', editedAt.toLocaleString()] : '', ' ',
+          m('a[target=_blank]', { href: API_URL + cmt.permalink }, m.trust('&#x1f517;'))
+        ]),
+        !cmt.collapsed ? [
+          m('div.post-comment-text', m.trust(util.htmlDecode(cmt.body_html))),
+          cmt.replies ? m('div.post-comment-replies', cmt.replies.data.children.map((c, idx, arr) => {
+            if(c.kind === 'more') return m(LoadMoreComments, { parentArray: arr, moreComments: c.data });
+            return m(PostComment, { comment: c.data });
+          })) : ''
+        ] : ''
+      ]);
     }
   };
 
@@ -499,7 +691,9 @@
     if(!ctrl.loading() && ctrl.posts().length > 0 && ctrl.posts().length <= app.state.limit + app.const.ADD_MORE_THRESHOLD) {
       ctrl.loadPosts();
     }
-    return [
+    return m('div.window', {
+      class: app.state.openPost ? 'noscroll' : ''
+    }, [
       m('h1.header', 'Ayy Rmao'),
       m('form.sr-form', { onsubmit: ctrl.handleSubmit }, [
         m('input[type=text][placeholder=subreddit]', { onchange: util.withAttrNoRedraw('value', ctrl.subreddit), value: ctrl.subreddit(), autofocus: !ctrl.subreddit() }),
@@ -510,8 +704,9 @@
         ]),
         m('button[type=submit].hidden')
       ]),
+      app.state.openPost ? m(PostCommentsModal) : '',
       ctrl.loading() ? m(pl.Loading, {}) : m(PostList, { posts: ctrl.posts, message: ctrl.getMessage() })
-    ];
+    ]);
   };
 
   app.mountElem = util.id('app');
