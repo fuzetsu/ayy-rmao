@@ -127,9 +127,10 @@
   
   var Comments = function() {};
   Comments.list = function(post) {
+    let link = post.permalink.slice(-1) === '/' ? post.permalink.slice(0, -1) : post.permalink;
     return m.request({
       method: 'GET',
-      url: API_URL + post.permalink + '.json',
+      url: API_URL + link + '.json',
       background: true
     }).then(function(data) {
       return data[1].data.children;
