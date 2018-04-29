@@ -419,6 +419,8 @@
     view(ctrl, args) {
       if(ctrl.loading()) return m(pl.Loading, {});
       let mc = args.moreComments;
+      // dont show button if no comments to load...
+      if(mc.count <= 0) return '';
       return m('a.btn-load-more-comments[href=#]', {
         onclick: e => {
           e.preventDefault();
