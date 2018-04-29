@@ -306,7 +306,7 @@
         ]),
         m('.info', [
           m('span.score', post.score),
-          ' points and ',
+          ' ', util.pluralize('point', post.score), ' and ',
           m('span.num-comments', post.num_comments),
           ' comments on ',
           m('span.sub-name', [
@@ -480,7 +480,10 @@
             onclick: e => cmt.collapsed = !cmt.collapsed
           }, '[', cmt.collapsed ? '+' : '-', '] '),
           m('span.post-comment-author', cmt.author), m.trust(' &#x2022; '),
-          cmt.score_hidden ? m('em.score-hidden', 'Score Hidden') : [m('span.score', cmt.score), ' points'], m.trust(' &#x2022; '),
+          cmt.score_hidden ? m('em.score-hidden', 'Score Hidden') : [
+            m('span.score', cmt.score), ' ', util.pluralize('point', cmt.score)
+          ],
+          m.trust(' &#x2022; '),
           util.prettyTime(createdAt) || createdAt.toLocaleString(),
           editedAt ? [m.trust(' &#x2022; '), ' edited ', util.prettyTime(editedAt) || editedAt.toLocaleString()] : '', m.trust(' &#x2022; '),
           m('a[target=_blank]', { href: API_URL + cmt.permalink }, m.trust('&#x1f517;'))
