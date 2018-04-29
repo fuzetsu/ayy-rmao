@@ -71,7 +71,26 @@
       }
       var c = "#" + ("00" + (~~(r * 255)).toString(16)).slice(-2) + ("00" + (~~(g * 255)).toString(16)).slice(-2) + ("00" + (~~(b * 255)).toString(16)).slice(-2);
       return (c);
-    }
+    },
+    prettyTime(d) {
+      // This function was copied, and slightly adapted from John Resig's website: https://johnresig.com/files/pretty.js
+      let date = new Date(d);
+      let diff = (Date.now() - date.getTime()) / 1000;
+      let day_diff = Math.floor(diff / 86400);
+      console.log(diff, day_diff);
+
+      if (isNaN(day_diff) || day_diff < 0 || day_diff >= 31) return;
+
+      return day_diff == 0 && (
+          diff < 60 && "just now" ||
+          diff < 120 && "1 minute ago" ||
+          diff < 3600 && Math.floor(diff / 60) + " minutes ago" ||
+          diff < 7200 && "1 hour ago" ||
+          diff < 86400 && Math.floor(diff / 3600) + " hours ago") ||
+        day_diff == 1 && "Yesterday" ||
+        day_diff < 7 && day_diff + " days ago" ||
+        day_diff < 31 && Math.ceil(day_diff / 7) + " weeks ago";
+      }
   };
 
   // common actions
@@ -447,7 +466,7 @@
   let PostComment = {
     view(vnode) {
       let cmt = vnode.attrs.comment;
-      let createdAt = new Date(cmt.created * 1000);
+      let createdAt = new Date(cmt.created_utc * 1000);
       let editedAt = cmt.edited && new Date(cmt.edited * 1000);
       let borderColor = _depthColors[cmt.depth];
       if(!borderColor) {
@@ -461,10 +480,10 @@
           m('strong.post-comment-collapse', {
             onclick: e => cmt.collapsed = !cmt.collapsed
           }, '[', cmt.collapsed ? '+' : '-', '] '),
-          m('span.post-comment-author', cmt.author), ', ',
-          m('span.score', cmt.score), ' points, posted: ',
-          createdAt.toLocaleString(),
-          editedAt ? [', edited: ', editedAt.toLocaleString()] : '', ' ',
+          m('span.post-comment-author', cmt.author), m.trust(' &#x2022; '),
+          m('span.score', cmt.score), ' points', m.trust(' &#x2022; '),
+          util.prettyTime(createdAt) || createdAt.toLocaleString(),
+          editedAt ? [m.trust(' &#x2022; '), ' edited ', util.prettyTime(editedAt) || editedAt.toLocaleString()] : '', m.trust(' &#x2022; '),
           m('a[target=_blank]', { href: API_URL + cmt.permalink }, m.trust('&#x1f517;'))
         ]),
         !cmt.collapsed ? [
