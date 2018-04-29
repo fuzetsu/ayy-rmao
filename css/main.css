@@ -252,3 +252,7 @@
 .post-comment blockquote:last-child {
   margin-bottom: 0;
 }
+
+.score-hidden {
+  color: #DDD;
+}
