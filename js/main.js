@@ -349,7 +349,11 @@
       let args = vnode.attrs;
       return m('div.overlay', {
         onclick: e => {
-          if(args.onclose && e.target.classList.contains('overlay')) args.onclose();
+          if(args.onclose && e.target.classList.contains('overlay')) {
+            args.onclose(); 
+          } else {
+            e.redraw = false;
+          }
         }
       }, m('div.modal', [
         m('div.modal-header', [
@@ -551,7 +555,8 @@
         }
         this.failed = false;
         this.writeState();
-        Post.list(this.subreddit, this.after, this.nsfw)
+        let after = this.posts.length > 0 ? this.posts[this.posts.length - 1].name : '';
+        Post.list(this.subreddit, after, this.nsfw)
           // apply filter
           .then(newPosts => {
             if(!this.filter) return newPosts;
@@ -560,7 +565,6 @@
           })
           // combine post lists
           .then(newPosts => {
-            if(newPosts.length > 0) this.after = newPosts[newPosts.length - 1].name;
             this.posts = this.posts.concat(newPosts);
             this.loading = false;
             m.redraw();
@@ -583,7 +587,6 @@
     },
     resetPosts() {
       this.posts = [];
-      this.after = '';
       this.syncWithAppState();
       let c = app.state;
       c.viewed.length = 0;
@@ -644,9 +647,10 @@
       }
     },
     view(vnode) {
-      if(!this.loading && this.posts.length > 0 && this.posts.length <= app.state.limit + app.const.ADD_MORE_THRESHOLD) {
+      if(!this.loading && this.posts.length > 0 && this.posts.length <= app.state.limit + app.const.ADD_MORE_THRESHOLD && app.state.limit !== this.lastLimit) {
         this.loadPosts();
       }
+      this.lastLimit = app.state.limit;
       return m('div.window', {
         onscroll: util.throttle(250, this.handleScroll),
         class: app.state.openPost ? 'noscroll' : ''
