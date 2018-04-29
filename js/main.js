@@ -77,7 +77,6 @@
       let date = new Date(d);
       let diff = (Date.now() - date.getTime()) / 1000;
       let day_diff = Math.floor(diff / 86400);
-      console.log(diff, day_diff);
 
       if (isNaN(day_diff) || day_diff < 0 || day_diff >= 31) return;
 
@@ -481,7 +480,7 @@
             onclick: e => cmt.collapsed = !cmt.collapsed
           }, '[', cmt.collapsed ? '+' : '-', '] '),
           m('span.post-comment-author', cmt.author), m.trust(' &#x2022; '),
-          m('span.score', cmt.score), ' points', m.trust(' &#x2022; '),
+          cmt.score_hidden ? m('em.score-hidden', 'Score Hidden') : [m('span.score', cmt.score), ' points'], m.trust(' &#x2022; '),
           util.prettyTime(createdAt) || createdAt.toLocaleString(),
           editedAt ? [m.trust(' &#x2022; '), ' edited ', util.prettyTime(editedAt) || editedAt.toLocaleString()] : '', m.trust(' &#x2022; '),
           m('a[target=_blank]', { href: API_URL + cmt.permalink }, m.trust('&#x1f517;'))
