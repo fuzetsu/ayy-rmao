@@ -27,9 +27,9 @@
     },
     throttle: function(limit, callback) {
       var wait = false;
-      return function() {
+      return function(...args) {
         if (!wait) {
-          callback();
+          callback(...args);
           wait = true;
           setTimeout(function() {
             wait = false;
@@ -634,7 +634,7 @@
     },
     handleScroll(e) {
       let scrollTop = e.target.scrollTop;
-      if(e.target.clientHeight - (window.innerHeight + scrollTop) < window.innerHeight) {
+      if(e.target.scrollHeight - (window.innerHeight + scrollTop) < window.innerHeight) {
         app.state.limit += app.const.LOAD_NUM;
       } else {
         e.redraw = false;
@@ -645,7 +645,7 @@
         this.loadPosts();
       }
       return m('div.window', {
-        onscroll: util.throttle(100, this.handleScroll),
+        onscroll: util.throttle(250, this.handleScroll),
         class: app.state.openPost ? 'noscroll' : ''
       }, [
         m('h1.header', 'Ayy Rmao'),
