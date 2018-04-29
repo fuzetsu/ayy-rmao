@@ -204,18 +204,13 @@
 }
 
 .post-comment {
-  padding: 4px 5px 1px 15px;
+  padding: 0 0 0 20px;
   border-left: 1px solid #555;
 }
 
 /* don't add bottom padding on last child since parent already has it */
 .post-comment:not(:last-child) {
-  padding-bottom: 12px;
-}
-
-/* don't show border on root level comments */
-.post-comments-list > .post-comment {
-  border-left: none;
+  margin-bottom: 20px;
 }
 
 .post-comments .post img, .post-comments .post video {
