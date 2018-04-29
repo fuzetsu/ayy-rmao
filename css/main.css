@@ -245,6 +245,10 @@
 
 .post-comment blockquote {
   padding-left: 8px;
-  border-left: 4px solid rgba(0, 0, 0, 0.2);
+  border-left: 4px solid #a2a2a2;
   margin: 4px 0px 4px 8px;
+}
+
+.post-comment blockquote:last-child {
+  margin-bottom: 0;
 }
