@@ -163,8 +163,8 @@
 }
 
 .modal {
+  width: 90%;
   max-width: 1200px;
-  min-width: 95%;
   max-height: 90vh;
   background: #333;
   border: 1px solid #999;
