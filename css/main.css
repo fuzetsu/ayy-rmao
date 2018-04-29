@@ -20,12 +20,12 @@
   text-align: center;
 }
 
-.post-list > div {
+.post {
   margin: 5px auto 15px auto;
 }
 
-.post-list img,
-.post-list video {
+.post img,
+.post video {
   max-width: 99%;
   max-height: 95vh;
 }
@@ -85,7 +85,7 @@
   width: 90%;
 }
 
-.post-list .content {
+.post .content {
   padding: 20px 30px 30px 30px;
 }
 
@@ -164,6 +164,7 @@
 
 .modal {
   max-width: 1200px;
+  min-width: 95%;
   max-height: 90vh;
   background: #333;
   border: 1px solid #999;
@@ -176,7 +177,7 @@
   display: flex;
   flex-direction: row;
   border-bottom: 1px solid #999;
-  padding: 15px;
+  padding: 10px 10px 5px 10px;
 }
 
 .modal-body {
@@ -217,18 +218,22 @@
   border-left: none;
 }
 
+.post-comments .post img, .post-comments .post video {
+  max-height: 50vh;
+}
+
 .post-comment-info {
   font-size: 90%;
   color: #adadad;
   margin-bottom: 5px;
 }
 
-.modal a {
+.post-comments-list a {
   color: #ffc9c9;
   text-decoration: none;
 }
 
-.modal a:hover {
+.post-comments-list a:hover {
   text-decoration: underline;
 }
 

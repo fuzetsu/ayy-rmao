@@ -1,17 +1,17 @@
 /*global m,location,localStorage */
 (function() {
 
-  var app = {};
+  let app = {};
 
-  var API_URL = 'https://www.reddit.com';
+  const API_URL = 'https://www.reddit.com';
 
-  var IMAGES = {  
+  const IMAGES = {  
     loading: 'img/loading.gif'
   };
 
   // UTIL
 
-  var util = {
+  let util = {
     id: function(id) {
       return document.getElementById(id);
     },
@@ -21,7 +21,7 @@
       });
     },
     htmlDecode: function(input) {
-      var e = document.createElement('div');
+      let e = document.createElement('div');
       e.innerHTML = input;
       return e.childNodes.length === 0 ? "" : e.childNodes[0].nodeValue;
     },
@@ -37,16 +37,11 @@
         }
       };
     },
-    withAttrNoRedraw: function(attr, prop) {
-      return m.withAttr(attr, function(value) {
-        m.redraw.strategy('none');
-        prop(value);
-      });
-    },
-    deferredProp: function(value) {
-      var prop = m.deferred();
-      prop.resolve(value);
-      return prop.promise;
+    withAttrNoRedraw: function(attr, func) {
+      return e => {
+        e.redraw = false;
+        func(e.target[attr]);
+      };
     },
     pluralize: function(word, count) {
       return count !== 1 ? word + 's' : word;
@@ -80,20 +75,20 @@
   };
 
   // common actions
-  var ex = {
+  let ex = {
     toggleExpand: function(type, e) {
-      var target = e.target;
-      var titled = util.titleCase(type);
-      var style = target.style;
-      var viewport = window['inner' + titled];
-      var orig = (target['natural' + titled] || target['video' + titled] || '');
-      var cur = target['client' + titled];
-      var dim = style[type];
+      let target = e.target;
+      let titled = util.titleCase(type);
+      let style = target.style;
+      let viewport = window['inner' + titled];
+      let orig = (target['natural' + titled] || target['video' + titled] || '');
+      let cur = target['client' + titled];
+      let dim = style[type];
       if(!dim && (orig === cur || orig * 0.8 <= cur)) {
         dim = orig + '';
       }
       if (dim) {
-        if (dim.indexOf(orig) > -1 && orig <= viewport * 0.99) {
+        if (dim.includes(orig) && orig <= viewport * 0.99) {
           style[type] = (orig * 1.75) + 'px';
           style.maxHeight = 'none';
         } else {
@@ -109,23 +104,23 @@
 
   // MODELS
 
-  var Post = function() {};
+  let Post = function() {};
   Post.list = function(subreddit, after, nsfw) {
     return m.request({
       method: 'GET',
-      url: API_URL + '/r/' + subreddit + '.json?limit=' + app.const.REQUEST_NUM + '&after=' + after,
+      url: `${API_URL}/r/${subreddit}.json?limit=${app.const.REQUEST_NUM}&after=${after}`,
       background: true
     }).then(function(data) {
-      return data.data.children.filter(function(post) {
-        return (nsfw || !post.data.over_18) && app.state.viewed.indexOf(post.data.name) === -1;
-      }).map(function(post) {
-        app.state.viewed.push(post.data.name);
-        return detectPostType(post.data);
-      });
+      return data.data.children
+        .filter(post => (nsfw || !post.data.over_18) && !app.state.viewed.includes(post.data.name))
+        .map(post => {
+          app.state.viewed.push(post.data.name);
+          return detectPostType(post.data);
+        });
     });
   };
   
-  var Comments = function() {};
+  let Comments = function() {};
   Comments.list = function(post) {
     let link = post.permalink.slice(-1) === '/' ? post.permalink.slice(0, -1) : post.permalink;
     return m.request({
@@ -140,26 +135,16 @@
   // COMPONENTS
 
   // container for post layouts
-  var pl = {};
+  let pl = {};
 
   pl.Video = {
-    controller: function(args) {
-      var play = function(e) {
-        e.target.play();
-      };
-      var pause = function(e) {
-        e.target.pause();
-      };
-      return {
-        toggleExpand: ex.toggleExpand.bind(null, 'height'),
-        play: play,
-        pause: pause,
-      };
-    },
-    view: function(ctrl, args) {
-      var post = args.post;
+    play: e => e.target.play(),
+    pause: e => e.target.pause(),
+    toggleExpand: ex.toggleExpand.bind(null, 'height'),
+    view(vnode) {
+      let post = vnode.attrs.post;
       return m('.video-post', [
-        m('video.video[loop][preload=metadata]', { onmouseenter: ctrl.play, onmouseleave: ctrl.pause, onclick: ctrl.toggleExpand }, [
+        m('video.video[loop][preload=metadata]', { onmouseenter: this.play, onmouseleave: this.pause, onclick: this.toggleExpand }, [
           m('source[type=video/mp4]', { src: post.url })
         ])
       ]);
@@ -167,40 +152,34 @@
   };
 
   pl.Image = {
-    controller: function(args) {
-      return {
-        toggleExpand: ex.toggleExpand.bind(null, 'width')
-      };
-    },
-    view: function(ctrl, args) {
-      var post = args.post;
+    toggleExpand: ex.toggleExpand.bind(null, 'width'),
+    view(vnode) {
+      let post = vnode.attrs.post;
       return m('.image-post', [
-        m('img', { src: post.url, onclick: ctrl.toggleExpand })
+        m('img', { src: post.url, onclick: this.toggleExpand })
       ]);
     }
   };
 
   pl.Embed = {
-    controller: function(args) {
-      return {
-        loaded: m.prop(false)
-      };
+    oninit(vnode) {
+      this.loaded = false;
     },
-    view: function(ctrl, args) {
-      var post = args.post;
-      var url = post.url;
+    view(vnode) {
+      let post = vnode.attrs.post;
+      let url = post.url;
       if(location.protocol === 'https:') {
         url = url.replace(/^.+:/, location.protocol);
       }
       return m('.embed-post', [
-        ctrl.loaded() ? m('iframe.embed[frameborder=0]', { src: url }) : m('button.load-embed', { onclick: ctrl.loaded.bind(null, true) }, 'Load ' + (post.desc || 'Embedded Content'))
+        this.loaded ? m('iframe.embed[frameborder=0]', { src: url }) : m('button.load-embed', { onclick: e => this.loaded = true }, 'Load ' + (post.desc || 'Embedded Content'))
       ]);
     }
   };
 
   pl.Self = {
-    view: function(ctrl, args) {
-      var post = args.post;
+    view(vnode) {
+      var post = vnode.attrs.post;
       return m('.self-post', [
         m('.username', post.author + ' says: '),
         m('.content', post.selftext_html ? m.trust(util.htmlDecode(post.selftext_html)) : post.title)
@@ -209,8 +188,8 @@
   };
 
   pl.Link = {
-    view: function(ctrl, args) {
-      var post = args.post;
+    view(vnode) {
+      var post = vnode.attrs.post;
       return m('.link-post.self-post', [
         m('.username', post.author + ' says: '),
         m('.content', [
@@ -225,7 +204,8 @@
   };
 
   pl.Loading = {
-    controller: function(args) {
+    oninit(vnode) {
+      let args = vnode.attrs;
       if(args.post && args.post.parseAsync) {
         args.post.parseAsync(args.post.url, args.post).then(function(url) {
           args.post.parseAsync = null;
@@ -234,7 +214,7 @@
         });
       }
     },
-    view: function(ctrl, args) {
+    view(vnode) {
       return m('.loading', [
         m('img', { src: IMAGES.loading })
       ]);
@@ -242,7 +222,7 @@
   };
 
   // the base list of attributes to copy
-  var baseAttrs = ['name', 'permalink', 'subreddit', 'score', 'num_comments', 'title'];
+  let baseAttrs = ['name', 'permalink', 'subreddit', 'score', 'num_comments', 'title'];
 
   // array of post types, how to match, and how to display them
   var postTypes = [
@@ -255,7 +235,7 @@
     }}, 
     { type: 'Image', match: /\.(jpg|png|gif)$/i},
     { type: 'Image', match: /imgur\.com\/[a-z0-9]+$/i, parse: function(url) {
-      return 'http://i.imgur.com/' + url.match(/([^\/]+)$/)[0] + '.gif';
+      return `http://i.imgur.com/${url.match(/([^\/]+)$/)[0]}.gif`;
     }},
     { type: 'Embed', desc: 'Imgur Gallery', match: /imgur\.com\/(a|gallery)\/[a-z0-9]+$/i, parse: function(url) {
       return url.replace(/\/gallery\//, '/a/').replace(/^http:/, 'https:') + '/embed?pub=true&analytics=false';
@@ -279,17 +259,13 @@
   ];
 
   // iterates through post types looking for a match for the given url
-  var detectPostType = function(post) {
-    var url = post.url.replace(/[\?#].*$/, '');
-    var npost = {};
-    postTypes.some(function(type) {
+  let detectPostType = function(post) {
+    let url = post.url.replace(/[\?#].*$/, '');
+    let npost = {};
+    postTypes.some(type => {
       if((typeof type.match === 'function' ? type.match(post) : type.match.test(url))) {
-        baseAttrs.concat(type.fields || []).forEach(function(field) {
-          npost[field] = post[field];
-        });
-        ['type', 'parseAsync', 'desc'].forEach(function(field) {
-          npost[field] = type[field];
-        });
+        baseAttrs.concat(type.fields || []).forEach(field => npost[field] = post[field]);
+        ['type', 'parseAsync', 'desc'].forEach(field => npost[field] = type[field]);
         npost.url = type.parse ? type.parse(type.strip === false ? post.url : url) : (type.strip ? url : post.url);
         return true;
       }
@@ -297,17 +273,16 @@
     return npost;
   };
 
-  var PostItem = {
-    view: function(ctrl, args) {
-      var post = args.post;
-      var comp = pl[post.type];
-      return m('.post', [
+  let PostInfo = {
+    view(vnode) {
+      let post = vnode.attrs.post;
+      return m('div', [
         m('.title', [
           m('a[target=_blank]', { 
             href: API_URL + post.permalink,
             title: post.subreddit,
             onclick: function(e) {
-              if(e.ctrlKey) return;
+              if(e.ctrlKey || vnode.attrs.readOnly) return;
               e.preventDefault();
               app.state.openPost = post;
             }
@@ -320,13 +295,23 @@
           ' comments on ',
           m('span.sub-name', [
             m('a', {
-              href: `#subreddit is ${post.subreddit} and nsfw is ${app.state.nsfw() ? 'enabled' : 'disabled'}`,
+              href: `#subreddit is ${post.subreddit} and nsfw is ${app.state.nsfw ? 'enabled' : 'disabled'}`,
               onclick: e => {
                 if(e.button === 0) setTimeout(() => location.reload(), 200);
               }
             }, post.subreddit)
           ])
-        ]),
+        ])
+      ]);
+    }
+  };
+
+  let PostItem = {
+    view(vnode) {
+      var post = vnode.attrs.post;
+      var comp = pl[post.type];
+      return m('.post', [
+        !vnode.attrs.noInfo ? m(PostInfo, { post: post })  : '',
         post.parseAsync ? m(pl.Loading, { post: post }) : (
           m(comp, { post: post })
         )
@@ -334,19 +319,18 @@
     }
   };
 
-  var PostList = {
-    view: function(ctrl, args) {
-      var posts = args.posts().slice(0, app.state.limit).map(function(post) {
-        return m(PostItem, { post: post });
-      });
-      return m('.post-list', (posts.length > 0 ? posts : [
-        m('p.message', args.message || 'Nothing here...')
-      ]));
+  let PostList = {
+    view(vnode) {
+      let posts = vnode.attrs.posts
+        .slice(0, app.state.limit)
+        .map(post => m(PostItem, { post: post }));
+      return m('.post-list', posts.length > 0 ? posts : m('p.message', vnode.attrs.message || 'Nothing here...'));
     }
   };
   
-  var Modal = {
-    view: function(ctrl, args) {
+  let Modal = {
+    view(vnode) {
+      let args = vnode.attrs;
       return m('div.overlay', {
         onclick: e => {
           if(args.onclose && e.target.classList.contains('overlay')) args.onclose();
@@ -367,43 +351,35 @@
     }
   };
   
-  var PostCommentsModal = {
-    controller: function(args) {
-      let ctrl = {
-        post: app.state.openPost,
-        onclose: () => app.state.openPost = null,
-      };
-      return ctrl;
-    },
+  let PostCommentsModal = {
+    onclose: () => app.state.openPost = null,
     view: function(ctrl, args) {
+      let post = app.state.openPost;
       return m(Modal, {
-        onclose: ctrl.onclose,
-        header: [
-          m('a[target=_blank]', { href: API_URL + ctrl.post.permalink }, 'Comments: '),
-          m.trust(ctrl.post.title)
-        ],
-        content: m(PostComments, { post: ctrl.post })
+        onclose: this.onclose,
+        header: m('div.center', m(PostInfo, { post: post, readOnly: true })),
+        content: m(PostComments, { post: post })
       });
     }
   };
   
-  var PostComments = {
-    controller: function(args) {
-      var comments = m.prop([]);
-      var loading = m.prop(true);
-      Comments.list(args.post)
-        .then(comments)
-        .then(loading.bind(null, false))
-        .then(m.redraw)
-      return {
-        loading: loading,
-        comments: comments
-      };
+  let PostComments = {
+    oninit(vnode) {
+      this.comments = [];
+      this.loading = true;
+      this.post = vnode.attrs.post;
+      // load comments
+      Comments.list(this.post).then(data => {
+        this.comments = data;
+        this.loading = false;
+        m.redraw();
+      });
     },
-    view: function(ctrl, args) {
+    view(vnode) {
+      if(this.loading) return m('div.center', m(pl.Loading, {}));
       return m('div.post-comments', [
-        ctrl.loading() ? m('div.center', m(pl.Loading, {})) : '',
-        m('div.post-comments-list', ctrl.comments().map((c, idx, arr) => {
+        m('div.center', m(PostItem, { post: this.post, noInfo: true })),
+        m('div.post-comments-list', this.comments.map((c, idx, arr) => {
           if(c.kind === 'more') return m(LoadMoreComments, { parentArray: arr, moreComments: c.data });
           return m(PostComment, {comment: c.data });
         }))
@@ -411,21 +387,18 @@
     }
   };
   
-  var LoadMoreComments = {
-    controller(args) {
-      return {
-        loading: m.prop(false)
-      };
-    },
-    view(ctrl, args) {
-      if(ctrl.loading()) return m(pl.Loading, {});
+  let LoadMoreComments = {
+    loading: false,
+    view(vnode) {
+      if(this.loading) return m(pl.Loading, {});
+      let args = vnode.attrs;
       let mc = args.moreComments;
       // dont show button if no comments to load...
       if(mc.count <= 0) return '';
       return m('a.btn-load-more-comments[href=#]', {
         onclick: e => {
           e.preventDefault();
-          ctrl.loading(true);
+          this.loading = true;
           m.request({
             method: 'GET',
             url: API_URL + '/api/morechildren.json',
@@ -435,7 +408,7 @@
               link_id: app.state.openPost.name
             }
           }).then(data => {
-            ctrl.loading(false);
+            this.loading = false;
             console.log('more comments => ', data);
             if(!data || !data.json || !data.json.data || !data.json.data.things || data.json.data.things.length <= 0) {
               console.log('didnt get more comments to load :(', data && data.json && data.json.errors);
@@ -472,16 +445,16 @@
     }
   };
   
-  var _borderColor = {};
-  var PostComment = {
-    view: function(ctrl, args) {
-      let cmt = args.comment;
+  let _depthColors = {};
+  let PostComment = {
+    view(vnode) {
+      let cmt = vnode.attrs.comment;
       let createdAt = new Date(cmt.created * 1000);
       let editedAt = cmt.edited && new Date(cmt.edited * 1000);
-      let borderColor = _borderColor[cmt.depth];
+      let borderColor = _depthColors[cmt.depth];
       if(!borderColor) {
         borderColor = util.genColor(12, cmt.depth);
-        _borderColor[cmt.depth] = borderColor;
+        _depthColors[cmt.depth] = borderColor;
       }
       return m('div.post-comment', {
         style: `border-left-color: ${borderColor};`
@@ -509,15 +482,15 @@
 
   // GLOBAL EVENTS
 
-  window.addEventListener('scroll', util.throttle(100, function(e) {
-    var scrollTop = Math.max(document.documentElement.scrollTop, document.body.scrollTop);
+  window.addEventListener('scroll', util.throttle(100, e => {
+    let scrollTop = Math.max(document.documentElement.scrollTop, document.body.scrollTop);
     if(document.body.clientHeight - (window.innerHeight + scrollTop) < window.innerHeight) {
       app.state.limit += app.const.LOAD_NUM;
       m.redraw();
     }
   }));
 
-  window.addEventListener('hashchange', function() {
+  window.addEventListener('hashchange', e => {
     if(!app.state.changingHash) {
       location.reload();
       // m.mount(app.mountElem, null);
@@ -541,194 +514,139 @@
     limit: 3,
     viewed: [],
     changingHash: false,
-    subreddit: m.prop(''),
-    nsfw: m.prop(false),
-    filter: m.prop(localStorage[app.const.FKEY] || ''),
+    subreddit: '',
+    nsfw: false,
+    filter: localStorage[app.const.FKEY] || '',
   };
-
-  app.controller = function() {
-    // the subreddit to load
-    var subreddit = app.state.subreddit;
-    // subreddits to filter out from results
-    var filter = app.state.filter;
-    // whether or not to allow nsfw posts
-    var nsfw = app.state.nsfw;
-    // running list of posts
-    var posts = m.prop([]);
-    // starting point for post loading
-    var after = m.prop('');
-    // whether loading failed
-    var failed = m.prop(false);
-    // the subreddit currently showing
-    var cur = {
-      subreddit: m.prop(''),
-      nsfw: m.prop(false),
-      filter: m.prop(filter())
-    };
-    // whether we're currently loading
-    var loading = m.prop(false);
-
-    // -- START PRIVATE
-    var noteAfter = function(newPosts) {
-      if(newPosts.length > 0) after(newPosts[newPosts.length - 1].name);
-      return newPosts;
-    };
-
-    var resetPosts = function() {
-      posts([]);
-      after('');
-      cur.nsfw(false);
-      cur.subreddit('');
-      cur.filter(localStorage[app.const.FKEY] || '');
-      app.state.viewed.length = 0;
-      app.state.limit = app.const.FIRST_LOAD_NUM;
-    };
-
-    var appendPosts = function(newPosts) {
-      posts(posts().concat(newPosts));
-      return newPosts;
-    };
-
-    var writeState = function() {
-      cur.subreddit(subreddit());
-      cur.nsfw(nsfw());
-      cur.filter(filter());
-      localStorage[app.const.FKEY] = filter();
-      setHash('subreddit is ' + cur.subreddit() + (cur.filter() ? ' and filter is ' + cur.filter() : '') + ' and nsfw is ' + (cur.nsfw() ? 'enabled' : 'disabled'));
-    };
-
-    var readState = function() {
-      var hash = decodeURIComponent(location.hash);
+  
+  let AyyRmao = {
+    oninit(vnode) {
+      this.loading = false;
+      this.posts = [];
+      // read hash and load posts if appropriate
+      if(this.readState()) {
+        this.loadPosts();
+      }
+    },
+    somethingChanged() {
+      let c = app.state;
+      return c.subreddit !== this.subreddit || c.nsfw !== this.nsfw || c.filter !== this.filter;
+    },
+    loadPosts() {
+      if(this.subreddit) {
+        if(this.somethingChanged()) {
+          this.loading = true;
+          this.resetPosts();
+        }
+        this.failed = false;
+        this.writeState();
+        Post.list(this.subreddit, this.after, this.nsfw)
+          // apply filter
+          .then(newPosts => {
+            if(!this.filter) return newPosts;
+            let filtered = this.filter.split('+');
+            return newPosts.filter(post => !filtered.includes(post.subreddit));
+          })
+          // combine post lists
+          .then(newPosts => {
+            if(newPosts.length > 0) this.after = newPosts[newPosts.length - 1].name;
+            this.posts = this.posts.concat(newPosts);
+            this.loading = false;
+            m.redraw();
+          }, err => {
+            if(err) console.log(err);
+            this.loading = false;
+            this.failed = true;
+            m.redraw();
+          });
+      } else {
+        this.setHash('');
+        this.resetPosts();
+      }
+    },
+    syncWithAppState() {
+      let c = app.state;
+      c.subreddit = this.subreddit;
+      c.nsfw = this.nsfw;
+      c.filter = this.filter;
+    },
+    resetPosts() {
+      this.posts = [];
+      this.after = '';
+      this.syncWithAppState();
+      let c = app.state;
+      c.viewed.length = 0;
+      c.limit = app.const.FIRST_LOAD_NUM;
+    },
+    handleSubmit(e) {
+      e.preventDefault();
+      if(this.somethingChanged()) {
+        this.loadPosts();
+      }
+    },
+    readState() {
+      let hash = decodeURIComponent(location.hash);
       if(hash) {
-        var state = {};
-        hash.slice(1).split(' and ').forEach(function(thing) {
-          var pair = thing.split(' is ');
+        let state = {};
+        hash.slice(1).split(' and ').forEach(thing => {
+          let pair = thing.split(' is ');
           state[pair[0]] = pair[1];
         });
         if('subreddit' in state) {
-          subreddit(state.subreddit);
+          this.subreddit = state.subreddit;
         }
         if('nsfw' in state) {
-          nsfw(state.nsfw === 'enabled');
+          this.nsfw = state.nsfw === 'enabled';
         }
         if('filter' in state) {
           localStorage[app.const.FKEY] = state.filter;
-          filter(state.filter);
+          this.filter = state.filter;
         }
         return true;
       }
       return false;
-    };
-
-    var setHash = function(hash) {
+    },
+    writeState() {
+      this.syncWithAppState();
+      localStorage[app.const.FKEY] = this.filter;
+      this.setHash('subreddit is ' + this.subreddit + (this.filter ? ' and filter is ' + this.filter : '') + ' and nsfw is ' + (this.nsfw ? 'enabled' : 'disabled'));
+    },
+    setHash(hash) {
       clearInterval(app.state.timeoutId);
       app.state.changingHash = true;
       location.hash = hash;
-      app.state.timeoutId = setTimeout(() => {
-        app.state.changingHash = false;
-      }, 500);
-    };
-
-    var somethingChanged = function() {
-      return subreddit() !== cur.subreddit() || nsfw() !== cur.nsfw() || filter() !== cur.filter();
-    };
-
-    var handleError = function(e) {
-      loading(false);
-      failed(true);
-      m.redraw();
-    };
-
-    var applyFilter = function(posts) {
-      if(!filter()) return posts;
-      var filtered = filter().split('+');
-      return posts.filter(function(post) {
-        return filtered.indexOf(post.subreddit) === -1;
-      });
-    };
-    // -- END PRIVATE
-
-    // -- START PUBLIC
-    var handleSubmit = function(e) {
-      e.preventDefault();
-      if(somethingChanged()) {
-        loadPosts();
-      }
-    };
-
-    var loadPosts = function() {
-      if(subreddit()) {
-        if(somethingChanged()) {
-          resetPosts();
-          loading(true);
-        }
-        failed(false);
-        writeState();
-        Post.list(subreddit(), after(), nsfw())
-          .then(applyFilter)
-          .then(noteAfter)
-          .then(appendPosts)
-          .then(loading.bind(null, false))
-          .then(m.redraw, handleError);
-      } else {
-        setHash('');
-        resetPosts();
-      }
-    };
-
-    var getMessage = function() {
-      if(failed()) {
+      app.state.timeoutId = setTimeout(() => app.state.changingHash = false, 500);
+    },
+    getMessage() {
+      if(this.failed) {
         return 'Failed to load subreddit. Please check name and try again.';
-      } else if(!subreddit()) {
+      } else if(!this.subreddit) {
         return 'Please enter a subreddit and press enter.';
       }
-    };
-    // -- END PUBLIC
-
-    // read hash and load posts if appropriate
-    if(readState()) {
-      loadPosts();
-    }
-
-    return {
-      // props
-      loading: loading,
-      posts: posts,
-      subreddit: subreddit,
-      filter: filter,
-      nsfw: nsfw,
-      // funcs
-      getMessage: getMessage,
-      loadPosts: loadPosts,
-      handleSubmit: handleSubmit,
-    };
-
-  };
-
-  app.view = function(ctrl, args) {
-    if(!ctrl.loading() && ctrl.posts().length > 0 && ctrl.posts().length <= app.state.limit + app.const.ADD_MORE_THRESHOLD) {
-      ctrl.loadPosts();
-    }
-    return m('div.window', {
-      class: app.state.openPost ? 'noscroll' : ''
-    }, [
-      m('h1.header', 'Ayy Rmao'),
-      m('form.sr-form', { onsubmit: ctrl.handleSubmit }, [
-        m('input[type=text][placeholder=subreddit]', { onchange: util.withAttrNoRedraw('value', ctrl.subreddit), value: ctrl.subreddit(), autofocus: !ctrl.subreddit() }),
-        m('input[type=text][placeholder=filter]', { onchange: util.withAttrNoRedraw('value', ctrl.filter), value: ctrl.filter() }),
-        m('label', [
-          m('input[type=checkbox]', { onclick: util.withAttrNoRedraw('checked', ctrl.nsfw), checked: ctrl.nsfw() }),
-          m('span', 'nsfw?')
+    },
+    view(vnode) {
+      if(!this.loading && this.posts.length > 0 && this.posts.length <= app.state.limit + app.const.ADD_MORE_THRESHOLD) {
+        this.loadPosts();
+      }
+      return m('div.window', {
+        class: app.state.openPost ? 'noscroll' : ''
+      }, [
+        m('h1.header', 'Ayy Rmao'),
+        m('form.sr-form', { onsubmit: e => this.handleSubmit(e) }, [
+          m('input[type=text][placeholder=subreddit]', { onchange: util.withAttrNoRedraw('value', v => this.subreddit = v), value: this.subreddit, autofocus: !this.subreddit }),
+          m('input[type=text][placeholder=filter]', { onchange: util.withAttrNoRedraw('value', v => this.filter = v), value: this.filter }),
+          m('label', [
+            m('input[type=checkbox]', { onclick: util.withAttrNoRedraw('checked', v => this.nsfw = v), checked: this.nsfw }),
+            m('span', 'nsfw?')
+          ]),
+          m('button[type=submit].hidden')
         ]),
-        m('button[type=submit].hidden')
-      ]),
-      app.state.openPost ? m(PostCommentsModal) : '',
-      ctrl.loading() ? m(pl.Loading, {}) : m(PostList, { posts: ctrl.posts, message: ctrl.getMessage() })
-    ]);
+        app.state.openPost ? m(PostCommentsModal) : '',
+        this.loading ? m(pl.Loading, {}) : m(PostList, { posts: this.posts, message: this.getMessage() })
+      ]);
+    }
   };
 
-  app.mountElem = util.id('app');
-
-  m.mount(app.mountElem, app);
+  m.mount(util.id('app'), AyyRmao);
 
 }());
