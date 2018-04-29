@@ -157,14 +157,15 @@
   overflow: auto;
   text-align: initial;
   z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .modal {
-  max-width: 900px;
-  max-height: 80vh;
-  margin: auto;
+  max-width: 1200px;
+  max-height: 90vh;
   background: #333;
-  margin-top: 10vh;
   border: 1px solid #999;
   border-radius: 10px;
   display: flex;

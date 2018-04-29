@@ -433,7 +433,7 @@
             }
           }).then(data => {
             ctrl.loading(false);
-            console.log(data);
+            console.log('more comments => ', data);
             if(!data || !data.json || !data.json.data || !data.json.data.things || data.json.data.things.length <= 0) {
               console.log('didnt get more comments to load :(', data && data.json && data.json.errors);
               return;
