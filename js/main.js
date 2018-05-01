@@ -15,11 +15,11 @@
     day: `
 .window {
   color: #333;
-  background: white;
+  background: #EAEBEB;
 }
 
 .modal {
-  background: white;
+  background: #f7f7f7;
 }
 
 .post-comment-info {
@@ -39,8 +39,7 @@
 }
 
 .self-post {
-  box-shadow: none;
-  border: 1px solid #aaa;
+  box-shadow: 0 2px 2px 0 rgba(0,0,0,0.14), 0 3px 1px -2px rgba(0,0,0,0.12), 0 1px 5px 0 rgba(0,0,0,0.2);
   border-radius: 5px;
 }
 
@@ -52,7 +51,12 @@
   background: #ccc;
 }
     `
-  }
+  };
+
+  const BORDERS = {
+    day: ['rgb(226, 26, 25)','rgb(243, 146, 51)','rgb(249, 231, 49)','rgb(84, 166, 76)','rgb(54, 141, 238)'],
+    night: ['rgb(226, 26, 25)','rgb(243, 146, 51)','rgb(249, 231, 49)','rgb(84, 166, 76)','rgb(54, 141, 238)']
+  };
 
   // UTIL
 
@@ -537,17 +541,12 @@
     }
   };
   
-  let _depthColors = {};
   let PostComment = {
     view(vnode) {
       let cmt = vnode.attrs.comment;
       let createdAt = new Date(cmt.created_utc * 1000);
       let editedAt = cmt.edited && new Date(cmt.edited * 1000);
-      let borderColor = _depthColors[cmt.depth];
-      if(!borderColor) {
-        borderColor = util.genColor(12, cmt.depth);
-        _depthColors[cmt.depth] = borderColor;
-      }
+      let borderColor = app.state.borders[cmt.depth % app.state.borders.length];
       return m('div.post-comment', {
         style: `border-left-color: ${borderColor};`
       }, [
@@ -561,7 +560,7 @@
           m.trust(' &#x2022; '),
           util.prettyTime(createdAt) || createdAt.toLocaleString(),
           editedAt ? [m.trust(' &#x2022; '), ' edited ', util.prettyTime(editedAt) || editedAt.toLocaleString()] : '', m.trust(' &#x2022; '),
-          m('a[target=_blank]', { href: API_URL + cmt.permalink }, m.trust('&#x1f517;'))
+          m('a[target=_blank]', { href: API_URL + cmt.permalink }, 'permalink')
         ]),
         !cmt.collapsed ? [
           m('div.post-comment-text', m.trust(util.htmlDecode(cmt.body_html))),
@@ -612,6 +611,7 @@
       this.posts = [];
       this.dayMode = util.storeGet(app.const.THEME_KEY) || false;
       if(this.dayMode === 'false') this.dayMode = false;
+      app.state.borders = this.dayMode ? BORDERS.day : BORDERS.night;
       // read hash and load posts if appropriate
       if(this.readState()) {
         this.loadPosts();
@@ -720,6 +720,11 @@
         e.redraw = false;
       }
     },
+    toggleTheme() {
+      this.dayMode = !this.dayMode;
+      util.storeSet(app.const.THEME_KEY, this.dayMode);
+      app.state.borders = this.dayMode ? BORDERS.day : BORDERS.night;
+    },
     view(vnode) {
       if(!this.loading && this.posts.length > 0 && this.posts.length <= app.state.limit + app.const.ADD_MORE_THRESHOLD && app.state.limit !== this.lastLimit) {
         this.loadPosts();
@@ -730,7 +735,7 @@
         class: app.state.openPost ? 'noscroll' : ''
       }, [
         m('h1.header', 'Ayy Rmao'),
-        m('div.theme-changer', { onclick: e => util.storeSet(app.const.THEME_KEY, this.dayMode = !this.dayMode) }, this.dayMode ? UNICODE.sun : UNICODE.moon),
+        m('div.theme-changer', { onclick: e => this.toggleTheme() }, this.dayMode ? UNICODE.sun : UNICODE.moon),
         m('style', this.dayMode ? CSS.day : ''),
         m('form.sr-form', { onsubmit: e => this.handleSubmit(e) }, [
           m('input[type=text][placeholder=subreddit]', { onchange: util.withAttrNoRedraw('value', v => this.subreddit = v), value: this.subreddit, autofocus: !this.subreddit }),

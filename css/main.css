@@ -53,7 +53,6 @@
   color: black;
   background-color: white;
   border-radius: 10px;
-  box-shadow: 5px 5px 10px rgba(50, 50, 50, 0.75);
   word-wrap: break-word;
   margin: auto;
 }
@@ -203,8 +202,8 @@
 }
 
 .post-comment {
-  padding: 0 0 0 20px;
-  border-left: 1px solid #555;
+  padding: 0 0 0 17px;
+  border-left: 3px solid #555;
 }
 
 .post-comment-op {
