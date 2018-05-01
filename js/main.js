@@ -9,8 +9,10 @@
     loading: 'img/loading.gif'
   };
 
+  const UNICODE = { sun: '\u{1F31E}', moon: '\u{1F31D}' };
+
   const CSS = {
-    DAY: `
+    day: `
 .window {
   color: #333;
   background: white;
@@ -85,6 +87,14 @@
         e.redraw = false;
         func(e.target[attr]);
       };
+    },
+    storeSet: function(key, val) {
+      localStorage[key] = JSON.stringify(val);
+    },
+    storeGet: function(key) {
+      let val = localStorage[key];
+      if(!val || val === 'undefined') return;
+      return JSON.parse(val);
     },
     pluralize: function(word, count) {
       return count !== 1 ? word + 's' : word;
@@ -581,6 +591,7 @@
     ADD_MORE_THRESHOLD: 10,
     REQUEST_NUM: 25,
     FKEY: 'ayy-rmao-filter',
+    THEME_KEY: 'day-mode'
   };
 
   app.state = {
@@ -589,14 +600,15 @@
     changingHash: false,
     subreddit: '',
     nsfw: false,
-    filter: localStorage[app.const.FKEY] || '',
+    filter: util.storeGet(app.const.FKEY) || '',
   };
   
   let AyyRmao = {
     oninit(vnode) {
       this.loading = false;
       this.posts = [];
-      this.dayMode = localStorage['day_mode'] || false;
+      this.dayMode = util.storeGet(app.const.THEME_KEY) || false;
+      if(this.dayMode === 'false') this.dayMode = false;
       // read hash and load posts if appropriate
       if(this.readState()) {
         this.loadPosts();
@@ -715,13 +727,8 @@
         class: app.state.openPost ? 'noscroll' : ''
       }, [
         m('h1.header', 'Ayy Rmao'),
-        m('div.theme-changer', {
-          onclick: e => {
-            this.dayMode = !this.dayMode;
-            localStorage['day_mode'] = this.dayMode;
-          }
-        }, this.dayMode ? '\u{1F31D}' : '\u{1F31E}'),
-        m('style', this.dayMode ? CSS.DAY : ''),
+        m('div.theme-changer', { onclick: e => util.storeSet(app.const.THEME_KEY, this.dayMode = !this.dayMode) }, this.dayMode ? UNICODE.sun : UNICODE.moon),
+        m('style', this.dayMode ? CSS.day : ''),
         m('form.sr-form', { onsubmit: e => this.handleSubmit(e) }, [
           m('input[type=text][placeholder=subreddit]', { onchange: util.withAttrNoRedraw('value', v => this.subreddit = v), value: this.subreddit, autofocus: !this.subreddit }),
           m('input[type=text][placeholder=filter]', { onchange: util.withAttrNoRedraw('value', v => this.filter = v), value: this.filter }),
