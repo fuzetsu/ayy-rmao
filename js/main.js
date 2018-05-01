@@ -43,12 +43,14 @@
   border-radius: 5px;
 }
 
-::-webkit-scrollbar-track {
-  background: #eee;
-}
+@media only screen and (min-device-width: 900px) {
+  ::-webkit-scrollbar-track {
+    background: #eee;
+  }
 
-::-webkit-scrollbar-thumb {
-  background: #ccc;
+  ::-webkit-scrollbar-thumb {
+    background: #ccc;
+  }
 }
     `
   };
