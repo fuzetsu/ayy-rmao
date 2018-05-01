@@ -9,6 +9,49 @@
     loading: 'img/loading.gif'
   };
 
+  const CSS = {
+    DAY: `
+.window {
+  color: #333;
+  background: white;
+}
+
+.modal {
+  background: white;
+}
+
+.post-comment-info {
+  color: #666;
+}
+
+.score-hidden {
+  color: #999;
+}
+
+.post-comments-list a {
+  color: #1b3e92;
+}
+
+.post-comment-collapse {
+  color: black;
+}
+
+.self-post {
+  box-shadow: none;
+  border: 1px solid #aaa;
+  border-radius: 5px;
+}
+
+::-webkit-scrollbar-track {
+  background: #eee;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #ccc;
+}
+    `
+  }
+
   // UTIL
 
   let util = {
@@ -289,6 +332,22 @@
     return npost;
   };
 
+  let ScoreIndicator = {
+    isGoodScore(score) {
+      if(score >= 500) return 'super-good';
+      if(score >= 20) return 'real-good';
+      if(score >= 1) return 'kinda-good';
+      if(score >= -5) return 'bad';
+      if(score >= -20) return 'real-bad';
+      return 'super-bad';
+    },
+    view(vnode) {
+      return m('span.score', {
+        class: this.isGoodScore(vnode.attrs.score),
+      }, vnode.attrs.score);
+    }
+  };
+
   let PostInfo = {
     view(vnode) {
       let post = vnode.attrs.post;
@@ -305,7 +364,7 @@
           }, m.trust(post.title)),
         ]),
         m('.info', [
-          m('span.score', post.score),
+          m(ScoreIndicator, { score: post.score }),
           ' ', util.pluralize('point', post.score), ' and ',
           m('span.num-comments', post.num_comments),
           ' comments on ',
@@ -483,10 +542,9 @@
           m('strong.post-comment-collapse', {
             onclick: e => cmt.collapsed = !cmt.collapsed
           }, '[', cmt.collapsed ? '+' : '-', '] '),
-          m('span.post-comment-author', cmt.author), m.trust(' &#x2022; '),
-          cmt.score_hidden ? m('em.score-hidden', 'Score Hidden') : [
-            m('span.score', cmt.score), ' ', util.pluralize('point', cmt.score)
-          ],
+          m('span.post-comment-author', { class: cmt.is_submitter ? 'post-comment-op' : '' }, cmt.author),
+          m.trust(' &#x2022; '),
+          cmt.score_hidden ? m('em.score-hidden', 'Score Hidden') : m(ScoreIndicator, { score: cmt.score }),
           m.trust(' &#x2022; '),
           util.prettyTime(createdAt) || createdAt.toLocaleString(),
           editedAt ? [m.trust(' &#x2022; '), ' edited ', util.prettyTime(editedAt) || editedAt.toLocaleString()] : '', m.trust(' &#x2022; '),
@@ -538,6 +596,7 @@
     oninit(vnode) {
       this.loading = false;
       this.posts = [];
+      this.dayMode = localStorage['day_mode'] || false;
       // read hash and load posts if appropriate
       if(this.readState()) {
         this.loadPosts();
@@ -656,6 +715,13 @@
         class: app.state.openPost ? 'noscroll' : ''
       }, [
         m('h1.header', 'Ayy Rmao'),
+        m('div.theme-changer', {
+          onclick: e => {
+            this.dayMode = !this.dayMode;
+            localStorage['day_mode'] = this.dayMode;
+          }
+        }, this.dayMode ? '\u{1F31D}' : '\u{1F31E}'),
+        m('style', this.dayMode ? CSS.DAY : ''),
         m('form.sr-form', { onsubmit: e => this.handleSubmit(e) }, [
           m('input[type=text][placeholder=subreddit]', { onchange: util.withAttrNoRedraw('value', v => this.subreddit = v), value: this.subreddit, autofocus: !this.subreddit }),
           m('input[type=text][placeholder=filter]', { onchange: util.withAttrNoRedraw('value', v => this.filter = v), value: this.filter }),
