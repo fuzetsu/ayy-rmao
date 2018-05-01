@@ -301,6 +301,9 @@
     { type: 'Video', match: /imgur.+\.(gif|gifv)$/i, parse: function(url) {
       return url.replace(/\.[^\.]+$/, '.mp4');
     }},
+    { type: 'Video', postParse: true, match: post => post.post_hint === 'hosted:video', parse: post => {
+      return post.media.reddit_video.fallback_url;
+    }},
     { type: 'Image', match: /reddituploads/i, strip: false, parse: function(url) {
       return url.replace(/&amp;/gi, '&');
     }}, 
@@ -335,7 +338,7 @@
       if((typeof type.match === 'function' ? type.match(post) : type.match.test(url))) {
         baseAttrs.concat(type.fields || []).forEach(field => npost[field] = post[field]);
         ['type', 'parseAsync', 'desc'].forEach(field => npost[field] = type[field]);
-        npost.url = type.parse ? type.parse(type.strip === false ? post.url : url) : (type.strip ? url : post.url);
+        npost.url = type.parse ? type.parse(type.postParse ? post : (type.strip === false ? post.url : url)) : (type.strip ? url : post.url);
         return true;
       }
     });
