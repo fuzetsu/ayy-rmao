@@ -11,6 +11,14 @@
   overflow: auto;
 }
 
+a {
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
 .sr-form > * {
   display: block;
   margin: 0 auto 5px auto;
@@ -50,14 +58,14 @@
   width: 750px;
   max-width: 80%;
   text-align: left;
-  color: black;
-  background-color: white;
-  border-radius: 10px;
+  color: white;
+  background-color: #484848;
+  border-radius: 5px;
   word-wrap: break-word;
   margin: auto;
 }
 
-.self-post > .username {
+.self-post-username {
   font-weight: bold;
   position: relative;
   top: 8px;
@@ -71,12 +79,7 @@
 }
 
 .title a {
-  text-decoration: none;
   color: inherit;
-}
-
-.title a:hover {
-  text-decoration: underline;
 }
 
 .embed {
@@ -84,7 +87,7 @@
   width: 90%;
 }
 
-.post .content {
+.self-post-content {
   padding: 20px 30px 30px 30px;
 }
 
@@ -134,6 +137,8 @@
 
 .noscroll {
   overflow: hidden;
+  /* width of the scroll bar */
+  padding-right: 20px;
 }
 
 .dib {
@@ -206,6 +211,10 @@
   border-left: 3px solid #555;
 }
 
+.post-comment-author {
+  color: #ddd;
+}
+
 .post-comment-op {
   color: #afafff;
 }
@@ -234,13 +243,8 @@
   margin-bottom: 5px;
 }
 
-.post-comments-list a {
+.post-comment-text a,.self-post-content a,.link {
   color: #ffc9c9;
-  text-decoration: none;
-}
-
-.post-comments-list a:hover {
-  text-decoration: underline;
 }
 
 .post-comment-collapse {

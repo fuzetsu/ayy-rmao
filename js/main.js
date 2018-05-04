@@ -30,8 +30,16 @@
   color: #999;
 }
 
-.post-comments-list a {
+.score {
+  font-weight: Bold;
+}
+
+.post-comment-text a,.self-post-content a,.link {
   color: #1b3e92;
+}
+
+.post-comment-author {
+  color: #1a1abd;
 }
 
 .post-comment-collapse {
@@ -41,6 +49,11 @@
 .self-post {
   box-shadow: 0 2px 2px 0 rgba(0,0,0,0.14), 0 3px 1px -2px rgba(0,0,0,0.12), 0 1px 5px 0 rgba(0,0,0,0.2);
   border-radius: 5px;
+  background: white;
+}
+
+.loading {
+  filter: invert(70%);
 }
 
 @media only screen and (min-device-width: 900px) {
@@ -256,25 +269,25 @@
 
   pl.Self = {
     view(vnode) {
-      var post = vnode.attrs.post;
+      let post = vnode.attrs.post;
       return m('.self-post', [
-        m('.username', post.author + ' says: '),
-        m('.content', post.selftext_html ? m.trust(util.htmlDecode(post.selftext_html)) : post.title)
+        m('.self-post-username', m('a[target=_blank].link', { href: `${API_URL}/u/${post.author}` }, post.author), ' says: '),
+        m('.self-post-content', post.selftext_html ? m.trust(util.htmlDecode(post.selftext_html)) : post.title)
       ]);
     }
   };
 
   pl.Link = {
     view(vnode) {
-      var post = vnode.attrs.post;
+      let post = vnode.attrs.post;
       return m('.link-post.self-post', [
-        m('.username', post.author + ' says: '),
-        m('.content', [
-          m('.center', [
-            m('a[target=_blank]', { href: post.url }, post.url),
+        m('.self-post-username', m('a[target=_blank].link', { href: `${API_URL}/u/${post.author}` }, post.author), ' says: '),
+        m('.self-post-content.center', [
+          m('a[target=_blank]', { href: post.url }, post.url),
+          post.thumbnail.indexOf('http') === 0 ? [
             m('br'),
             m('img', { src: post.thumbnail })
-          ])
+          ] : ''
         ])
       ]);
     }
@@ -292,8 +305,8 @@
       }
     },
     view(vnode) {
-      return m('.loading', [
-        m('img', { src: IMAGES.loading })
+      return m('div', [
+        m('img.loading', { src: IMAGES.loading })
       ]);
     }
   };
@@ -421,6 +434,20 @@
       return m('.post-list', posts.length > 0 ? posts : m('p.message', vnode.attrs.message || 'Nothing here...'));
     }
   };
+
+  let VotingButtons = {
+    view(vnode) {
+      let post = vnode.attrs.post;
+      return m('div.vote-buttons', [
+        m('span.vote-up', {
+          class: post.upvoted ? 'active' : ''
+        }),
+        m('span.vote-down', {
+          class: post.downvoted ? 'active' : ''
+        })
+      ]);
+    }
+  };
   
   let Modal = {
     view(vnode) {
@@ -493,7 +520,7 @@
       let mc = args.moreComments;
       // dont show button if no comments to load...
       if(mc.count <= 0) return '';
-      return m('a.btn-load-more-comments[href=#]', {
+      return m('a.link.btn-load-more-comments[href=#]', {
         onclick: e => {
           e.preventDefault();
           this.loading = true;
@@ -553,16 +580,20 @@
         style: `border-left-color: ${borderColor};`
       }, [
         m('div.post-comment-info', [
+          //m(VotingButtons, { post: cmt }),
           m('strong.post-comment-collapse', {
             onclick: e => cmt.collapsed = !cmt.collapsed
           }, '[', cmt.collapsed ? '+' : '-', '] '),
-          m('span.post-comment-author', { class: cmt.is_submitter ? 'post-comment-op' : '' }, cmt.author),
+          m('a[target=_blank].post-comment-author', { 
+            class: cmt.is_submitter ? 'post-comment-op' : '',
+            href: `${API_URL}/u/${cmt.author}`
+          }, cmt.author),
           m.trust(' &#x2022; '),
           cmt.score_hidden ? m('em.score-hidden', 'Score Hidden') : m(ScoreIndicator, { score: cmt.score }),
           m.trust(' &#x2022; '),
           util.prettyTime(createdAt) || createdAt.toLocaleString(),
           editedAt ? [m.trust(' &#x2022; '), ' edited ', util.prettyTime(editedAt) || editedAt.toLocaleString()] : '', m.trust(' &#x2022; '),
-          m('a[target=_blank]', { href: API_URL + cmt.permalink }, 'permalink')
+          m('a[target=_blank].link', { href: API_URL + cmt.permalink }, 'permalink')
         ]),
         !cmt.collapsed ? [
           m('div.post-comment-text', m.trust(util.htmlDecode(cmt.body_html))),
