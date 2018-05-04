@@ -726,7 +726,7 @@
     },
     writeState() {
       this.syncWithAppState();
-      util.storeSet(app.const.FKEY, state.filter);
+      util.storeSet(app.const.FKEY, this.filter);
       this.setHash('subreddit is ' + this.subreddit + (this.filter ? ' and filter is ' + this.filter : '') + ' and nsfw is ' + (this.nsfw ? 'enabled' : 'disabled'));
     },
     setHash(hash) {
