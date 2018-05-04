@@ -42,10 +42,6 @@
   color: #1a1abd;
 }
 
-.post-comment-collapse {
-  color: black;
-}
-
 .self-post {
   box-shadow: 0 2px 2px 0 rgba(0,0,0,0.14), 0 3px 1px -2px rgba(0,0,0,0.12), 0 1px 5px 0 rgba(0,0,0,0.2);
   border-radius: 5px;
@@ -641,6 +637,7 @@
   let AyyRmao = {
     oninit(vnode) {
       this.loading = false;
+      this.atPageTop = true;
       this.posts = [];
       this.dayMode = util.storeGet(app.const.THEME_KEY) || false;
       if(this.dayMode === 'false') this.dayMode = false;
@@ -747,6 +744,7 @@
     },
     handleScroll(e) {
       let scrollTop = e.target.scrollTop;
+      this.atPageTop = scrollTop < 20;
       if(e.target.scrollHeight - (window.innerHeight + scrollTop) < window.innerHeight) {
         app.state.limit += app.const.LOAD_NUM;
       } else {
@@ -764,11 +762,11 @@
       }
       this.lastLimit = app.state.limit;
       return m('div.window', {
-        onscroll: util.throttle(250, this.handleScroll),
+        onscroll: util.throttle(250, e => this.handleScroll(e)),
         class: app.state.openPost ? 'noscroll' : ''
       }, [
         m('h1.header', 'Ayy Rmao'),
-        m('div.theme-changer', { onclick: e => this.toggleTheme() }, this.dayMode ? UNICODE.sun : UNICODE.moon),
+        m('div.theme-changer', { onclick: e => this.toggleTheme(), class: this.atPageTop ? '' : 'show-on-hover' }, this.dayMode ? UNICODE.sun : UNICODE.moon),
         m('style', this.dayMode ? CSS.day : ''),
         m('form.sr-form', { onsubmit: e => this.handleSubmit(e) }, [
           m('input[type=text][placeholder=subreddit]', { onchange: util.withAttrNoRedraw('value', v => this.subreddit = v), value: this.subreddit, autofocus: !this.subreddit }),
