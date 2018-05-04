@@ -717,7 +717,7 @@
           this.nsfw = state.nsfw === 'enabled';
         }
         if('filter' in state) {
-          localStorage[app.const.FKEY] = state.filter;
+          util.storeSet(app.const.FKEY, state.filter);
           this.filter = state.filter;
         }
         return true;
@@ -726,7 +726,7 @@
     },
     writeState() {
       this.syncWithAppState();
-      localStorage[app.const.FKEY] = this.filter;
+      util.storeSet(app.const.FKEY, state.filter);
       this.setHash('subreddit is ' + this.subreddit + (this.filter ? ' and filter is ' + this.filter : '') + ' and nsfw is ' + (this.nsfw ? 'enabled' : 'disabled'));
     },
     setHash(hash) {
