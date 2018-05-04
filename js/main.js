@@ -744,11 +744,12 @@
     },
     handleScroll(e) {
       let scrollTop = e.target.scrollTop;
-      this.atPageTop = scrollTop < 20;
+      let wasAtPageTop = this.atPageTop;
+      this.atPageTop = scrollTop < 50;
       if(e.target.scrollHeight - (window.innerHeight + scrollTop) < window.innerHeight) {
         app.state.limit += app.const.LOAD_NUM;
       } else {
-        e.redraw = false;
+        if(wasAtPageTop === this.atPageTop) e.redraw = false;
       }
     },
     toggleTheme() {
