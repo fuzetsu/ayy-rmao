@@ -218,13 +218,32 @@ a:hover {
   color: #afafff;
 }
 
-.post-comment-op:after {
-  content: '[OP]';
+.post-comment-admin {
+  color: red;
+}
+
+.post-comment-mod {
+  color: #34ce34;
+}
+
+.post-comment-special:after {
   font-family: monospace;
   position: relative;
   top: -1px;
   margin-left: 3px;
-  color: #DDD;
+  color: #ddd;
+}
+
+.post-comment-op:after {
+  content: '[OP]';
+}
+
+.post-comment-mod:after {
+  content: '[MOD]';
+}
+
+.post-comment-admin:after {
+  content: '[ADMIN]';
 }
 
 /* don't add bottom padding on last child since parent already has it */
@@ -268,7 +287,7 @@ a:hover {
 }
 
 .score-hidden {
-  color: #DDD;
+  color: #fff;
 }
 
 /* scrollbar styles */
@@ -318,17 +337,12 @@ a:hover {
 
 /*  theme changer */
 .theme-changer {
-  position: absolute;
+  position: fixed;
   top: 5px;
-  right: 5px;
+  right: 25px;
   cursor: pointer;
   user-select: none;
   z-index: 100;
-}
-
-.theme-changer.show-on-hover {
-  position: fixed;
-  right: 25px;
 }
 
 .show-on-hover {

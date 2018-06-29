@@ -39,7 +39,23 @@
 }
 
 .post-comment-author {
+  color: #215854;
+}
+
+.post-comment-special:after {
+  color: black;
+}
+
+.post-comment-op {
   color: #1a1abd;
+}
+
+.post-comment-mod {
+  color: #109610;
+}
+
+.post-comment-admin {
+  color: red;
 }
 
 .self-post {
@@ -85,6 +101,9 @@
       e.innerHTML = input;
       return e.childNodes.length === 0 ? "" : e.childNodes[0].nodeValue;
     },
+    processRedditHtml(html) {
+      return util.htmlDecode(html).replace(/<a/gi, '<a target="_blank"');
+    },
     throttle: function(limit, callback) {
       var wait = false;
       return function(...args) {
@@ -113,32 +132,6 @@
     },
     pluralize: function(word, count) {
       return count !== 1 ? word + 's' : word;
-    },
-    genColor: function(numOfSteps, step) {
-      // This function generates vibrant, "evenly spaced" colours (i.e. no clustering). This is ideal for creating easily distinguishable vibrant markers in Google Maps and other apps.
-      // Adam Cole, 2011-Sept-14
-      // HSV to RBG adapted from: http://mjijackson.com/2008/02/rgb-to-hsl-and-rgb-to-hsv-color-model-conversion-algorithms-in-javascript
-      var r, g, b;
-      var h = step / numOfSteps;
-      var i = ~~(h * 6);
-      var f = h * 6 - i;
-      var q = 1 - f;
-      switch (i % 6) {
-        case 0:
-          r = 1;g = f;b = 0;break;
-        case 1:
-          r = q;g = 1;b = 0;break;
-        case 2:
-          r = 0;g = 1;b = f;break;
-        case 3:
-          r = 0;g = q;b = 1;break;
-        case 4:
-          r = f;g = 0;b = 1;break;
-        case 5:
-          r = 1;g = 0;b = q;break;
-      }
-      var c = "#" + ("00" + (~~(r * 255)).toString(16)).slice(-2) + ("00" + (~~(g * 255)).toString(16)).slice(-2) + ("00" + (~~(b * 255)).toString(16)).slice(-2);
-      return (c);
     },
     prettyTime(d) {
       // This function was copied, and slightly adapted from John Resig's website: https://johnresig.com/files/pretty.js
@@ -264,11 +257,15 @@
   };
 
   pl.Self = {
+    oninit(vnode) {
+      let post = vnode.attrs.post;
+      this.selfTextHtml = post.selftext_html && m.trust(util.processRedditHtml(post.selftext_html));
+    },
     view(vnode) {
       let post = vnode.attrs.post;
       return m('.self-post', [
         m('.self-post-username', m('a[target=_blank].link', { href: `${API_URL}/u/${post.author}` }, post.author), ' says: '),
-        m('.self-post-content', post.selftext_html ? m.trust(util.htmlDecode(post.selftext_html)) : post.title)
+        m('.self-post-content', this.selfTextHtml || post.title)
       ]);
     }
   };
@@ -514,18 +511,20 @@
       if(this.loading) return m(pl.Loading, {});
       let args = vnode.attrs;
       let mc = args.moreComments;
+      let count = mc.children && mc.children.length;
       // dont show button if no comments to load...
-      if(mc.count <= 0) return '';
+      if(count <= 0) return '';
       return m('a.link.btn-load-more-comments[href=#]', {
         onclick: e => {
           e.preventDefault();
           this.loading = true;
+          let childrenToLoad = mc.children.splice(0, app.const.COMMENT_LOAD_NUM);
           m.request({
             method: 'GET',
             url: API_URL + '/api/morechildren.json',
             data: {
               api_type: 'json',
-              children: mc.children.join(','),
+              children: childrenToLoad.join(','),
               link_id: app.state.openPost.name
             }
           }).then(data => {
@@ -535,10 +534,11 @@
               console.log('didnt get more comments to load :(', data && data.json && data.json.errors);
               return;
             }
-            // remove load more button
+            // detach load more button
+            let loadMoreButton;
             args.parentArray.some((c, idx) => {
               if(c.kind === 'more' && c.data.id === mc.id) {
-                args.parentArray.splice(idx, 1);
+                loadMoreButton = args.parentArray.splice(idx, 1)[0];
                 return true;
               }
             });
@@ -560,18 +560,34 @@
               }
               lastCommentAtDepth[cmt.data.depth] = cmt;
             });
+            // re-add load more button if necessary
+            if(mc.children.length > 0 && loadMoreButton) {
+              args.parentArray.push(loadMoreButton);
+            }
           }, err => console.log(err));
         }
-      }, 'Load ', mc.count, ' more ', util.pluralize('comment', mc.count), '.');
+      }, 'Load ', count > app.const.COMMENT_LOAD_NUM ? [
+        app.const.COMMENT_LOAD_NUM, ' (of ', count, ')'
+      ] : count, ' more ', util.pluralize('comment', count), '.');
     }
   };
   
   let PostComment = {
+    oninit(vnode) {
+      let cmt = vnode.attrs.comment;
+      // cache comment html for performance
+      this.commentHtml = m.trust(util.processRedditHtml(cmt.body_html));
+    },
     view(vnode) {
       let cmt = vnode.attrs.comment;
       let createdAt = new Date(cmt.created_utc * 1000);
       let editedAt = cmt.edited && new Date(cmt.edited * 1000);
       let borderColor = app.state.borders[cmt.depth % app.state.borders.length];
+      let cmtClasses = [
+        cmt.is_submitter ? 'post-comment-op' : '',
+        cmt.distinguished === 'moderator' ? 'post-comment-mod' : '',
+        cmt.distinguished === 'admin' ? 'post-comment-admin' : '',
+      ].join(' ').trim();
       return m('div.post-comment', {
         style: `border-left-color: ${borderColor};`
       }, [
@@ -581,7 +597,7 @@
             onclick: e => cmt.collapsed = !cmt.collapsed
           }, '[', cmt.collapsed ? '+' : '-', '] '),
           m('a[target=_blank].post-comment-author', { 
-            class: cmt.is_submitter ? 'post-comment-op' : '',
+            class: cmtClasses ? 'post-comment-special ' + cmtClasses : '',
             href: `${API_URL}/u/${cmt.author}`
           }, cmt.author),
           m.trust(' &#x2022; '),
@@ -591,18 +607,27 @@
           editedAt ? [m.trust(' &#x2022; '), ' edited ', util.prettyTime(editedAt) || editedAt.toLocaleString()] : '', m.trust(' &#x2022; '),
           m('a[target=_blank].link', { href: API_URL + cmt.permalink }, 'permalink')
         ]),
-        !cmt.collapsed ? [
-          m('div.post-comment-text', m.trust(util.htmlDecode(cmt.body_html))),
+        m('div', {
+          hidden: cmt.collapsed,
+        }, [
+          m('div.post-comment-text', this.commentHtml),
           cmt.replies ? m('div.post-comment-replies', cmt.replies.data.children.map((c, idx, arr) => {
             if(c.kind === 'more') return m(LoadMoreComments, { parentArray: arr, moreComments: c.data });
             return m(PostComment, { comment: c.data });
           })) : ''
-        ] : ''
+        ])
       ]);
     }
   };
 
   // GLOBAL EVENTS
+  window.addEventListener('keydown', e => {
+    if(e.code === 'KeyN' && e.target.nodeName !== 'INPUT') {
+      e.preventDefault();
+      app.state.dayMode = !app.state.dayMode;
+      m.redraw();
+    }
+  });
 
   window.addEventListener('hashchange', e => {
     if(!app.state.changingHash) {
@@ -620,6 +645,7 @@
     FIRST_LOAD_NUM: 7,
     LOAD_NUM: 3,
     ADD_MORE_THRESHOLD: 10,
+    COMMENT_LOAD_NUM: 50,
     REQUEST_NUM: 25,
     FKEY: 'ayy-rmao-filter',
     THEME_KEY: 'day-mode'
@@ -632,6 +658,7 @@
     subreddit: '',
     nsfw: false,
     filter: util.storeGet(app.const.FKEY) || '',
+    dayMode: util.storeGet(app.const.THEME_KEY) === 'true',
   };
   
   let AyyRmao = {
@@ -639,9 +666,7 @@
       this.loading = false;
       this.atPageTop = true;
       this.posts = [];
-      this.dayMode = util.storeGet(app.const.THEME_KEY) || false;
-      if(this.dayMode === 'false') this.dayMode = false;
-      app.state.borders = this.dayMode ? BORDERS.day : BORDERS.night;
+      app.state.borders = app.state.dayMode ? BORDERS.day : BORDERS.night;
       // read hash and load posts if appropriate
       if(this.readState()) {
         this.loadPosts();
@@ -753,9 +778,9 @@
       }
     },
     toggleTheme() {
-      this.dayMode = !this.dayMode;
-      util.storeSet(app.const.THEME_KEY, this.dayMode);
-      app.state.borders = this.dayMode ? BORDERS.day : BORDERS.night;
+      app.state.dayMode = !app.state.dayMode;
+      util.storeSet(app.const.THEME_KEY, app.state.dayMode);
+      app.state.borders = app.state.dayMode ? BORDERS.day : BORDERS.night;
     },
     view(vnode) {
       if(!this.loading && this.posts.length > 0 && this.posts.length <= app.state.limit + app.const.ADD_MORE_THRESHOLD && app.state.limit !== this.lastLimit) {
@@ -767,8 +792,8 @@
         class: app.state.openPost ? 'noscroll' : ''
       }, [
         m('h1.header', 'Ayy Rmao'),
-        m('div.theme-changer', { onclick: e => this.toggleTheme(), class: this.atPageTop ? '' : 'show-on-hover' }, this.dayMode ? UNICODE.sun : UNICODE.moon),
-        m('style', this.dayMode ? CSS.day : ''),
+        m('div.theme-changer', { onclick: e => this.toggleTheme(), class: this.atPageTop ? '' : 'show-on-hover' }, app.state.dayMode ? UNICODE.sun : UNICODE.moon),
+        m('style', app.state.dayMode ? CSS.day : ''),
         m('form.sr-form', { onsubmit: e => this.handleSubmit(e) }, [
           m('input[type=text][placeholder=subreddit]', { onchange: util.withAttrNoRedraw('value', v => this.subreddit = v), value: this.subreddit, autofocus: !this.subreddit }),
           m('input[type=text][placeholder=filter]', { onchange: util.withAttrNoRedraw('value', v => this.filter = v), value: this.filter }),
