@@ -286,6 +286,24 @@ a:hover {
   margin-bottom: 0;
 }
 
+.post-comment-refresh {
+  background: #ddd;
+  border-radius: 15px;
+  height: 16px;
+  width: 25px;
+  display: inline-block;
+  text-align: center;
+  box-sizing: border-box;
+  color: black;
+  cursor: pointer;
+  transition: transform 1.5s;
+  user-select: none;
+}
+
+.post-comment-refresh:hover {
+  transform: scale(1.5) rotate(360deg);
+}
+
 .score-hidden {
   color: #fff;
 }

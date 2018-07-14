@@ -200,15 +200,23 @@
   };
   
   let Comments = function() {};
-  Comments.list = function(post) {
+  Comments.list = function(post, comment) {
     let link = post.permalink.slice(-1) === '/' ? post.permalink.slice(0, -1) : post.permalink;
     return m.request({
       method: 'GET',
       url: API_URL + link + '.json',
-      background: true
+      background: true,
+      data: {
+        comment: comment && comment.id
+      }
     }).then(function(data) {
       return data[1].data.children;
     });
+  };
+  Comments.setDepth = function(comment, depth) {
+    if(!comment) return;
+    comment.depth = depth;
+    if(comment.replies) comment.replies.data.children.map(c => Comments.setDepth(c.data, depth + 1));
   };
 
   // COMPONENTS
@@ -578,6 +586,7 @@
       // cache comment html for performance
       this.commentHtml = m.trust(util.processRedditHtml(cmt.body_html));
     },
+    sep: () => m.trust(' &#x2022; '),
     view(vnode) {
       let cmt = vnode.attrs.comment;
       let createdAt = new Date(cmt.created_utc * 1000);
@@ -600,12 +609,27 @@
             class: cmtClasses ? 'post-comment-special ' + cmtClasses : '',
             href: `${API_URL}/u/${cmt.author}`
           }, cmt.author),
-          m.trust(' &#x2022; '),
+          this.sep(),
           cmt.score_hidden ? m('em.score-hidden', 'Score Hidden') : m(ScoreIndicator, { score: cmt.score }),
-          m.trust(' &#x2022; '),
+          this.sep(),
           util.prettyTime(createdAt) || createdAt.toLocaleString(),
-          editedAt ? [m.trust(' &#x2022; '), ' edited ', util.prettyTime(editedAt) || editedAt.toLocaleString()] : '', m.trust(' &#x2022; '),
-          m('a[target=_blank].link', { href: API_URL + cmt.permalink }, 'permalink')
+          editedAt ? [this.sep(), ' edited ', util.prettyTime(editedAt) || editedAt.toLocaleString()] : '',
+          this.sep(),
+          m('a[target=_blank].link', { href: API_URL + cmt.permalink }, 'permalink'),
+          this.sep(),
+          m('span.post-comment-refresh[title=Refresh Comment Thread]', {
+            onclick: e => {
+              e.redraw = false;
+              Comments.list(app.state.openPost, cmt).then(data => {
+                const newCmt = data[0];
+                if(!newCmt || !newCmt.data) return;
+                // normalize comment depth (will always start from 0 so set based on current depth)
+                Comments.setDepth(newCmt.data, cmt.depth);
+                _.mergeWith(cmt, newCmt.data, (o, i, key) => key === 'collapsed' ? o : i);
+                m.redraw();
+              });
+            }
+          }, '⟳')
         ]),
         m('div', {
           hidden: cmt.collapsed,
