@@ -273,6 +273,7 @@ pl.RedditVideo = {
     parts.push('audio')
     const sound = new Audio(parts.join('/'))
     sound.loop = true
+    sound.volume = 0.5
     let ready = false
     sound.oncanplay = () => (ready = true)
     this.play = ({ target: vid }) => {
