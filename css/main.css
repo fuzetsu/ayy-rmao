@@ -24,7 +24,7 @@ a:hover {
   margin: 0 auto 5px auto;
 }
 
-.sr-form input[type=text] {
+.sr-form input[type='text'] {
   text-align: center;
 }
 
@@ -46,8 +46,9 @@ a:hover {
   cursor: row-resize;
 }
 
-.help, .message {
-  font-size: .8em;
+.help,
+.message {
+  font-size: 0.8em;
 }
 
 .loading-post {
@@ -152,9 +153,9 @@ a:hover {
 
 .overlay {
   position: fixed;
-  background: rgba(0,0,0,0.65);
+  background: rgba(0, 0, 0, 0.65);
   top: 0;
-  bottom:  0;
+  bottom: 0;
   left: 0;
   right: 0;
   overflow: auto;
@@ -179,7 +180,7 @@ a:hover {
   display: flex;
   flex-direction: row;
   padding: 10px 10px 5px 10px;
-  box-shadow: 0 3px 7px -5px rgba(0,0,0,0.9);
+  box-shadow: 0 3px 7px -5px rgba(0, 0, 0, 0.9);
 }
 
 .modal-body {
@@ -251,7 +252,8 @@ a:hover {
   margin-bottom: 20px;
 }
 
-.post-comments .post img, .post-comments .post video {
+.post-comments .post img,
+.post-comments .post video {
   max-height: 50vh;
 }
 
@@ -261,7 +263,9 @@ a:hover {
   margin-bottom: 5px;
 }
 
-.post-comment-text a,.self-post-content a,.link {
+.post-comment-text a,
+.self-post-content a,
+.link {
   color: #ffc9c9;
 }
 
@@ -310,13 +314,12 @@ a:hover {
 
 /* scrollbar styles */
 @media only screen and (min-device-width: 900px) {
-
- ::-webkit-scrollbar {
+  ::-webkit-scrollbar {
     width: 20px;
   }
 
   ::-webkit-scrollbar-track {
-    -webkit-box-shadow: inset 0 0 2px rgba(0,0,0,0.3);
+    -webkit-box-shadow: inset 0 0 2px rgba(0, 0, 0, 0.3);
     background: #444;
     border-bottom-right-radius: 10px;
   }
@@ -324,7 +327,6 @@ a:hover {
   ::-webkit-scrollbar-thumb {
     background: #555;
   }
-
 }
 
 /* Post Comment Goodness Indicators  */
@@ -350,7 +352,7 @@ a:hover {
 }
 
 .super-bad {
-  color:  rgb(98, 103, 241);
+  color: rgb(98, 103, 241);
 }
 
 /*  theme changer */
