@@ -263,6 +263,10 @@ a:hover {
   margin-bottom: 5px;
 }
 
+.post-comment-text {
+  word-break: break-word;
+}
+
 .post-comment-text a,
 .self-post-content a,
 .link {
