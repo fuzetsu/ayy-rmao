@@ -87,7 +87,7 @@ const Main = () => {
         posts.length <= state.limit + ADD_MORE_THRESHOLD &&
         state.limit !== lastLimit
       ) {
-        loadPosts()
+        loadPosts(true)
       }
       lastLimit = state.limit
       return m(
