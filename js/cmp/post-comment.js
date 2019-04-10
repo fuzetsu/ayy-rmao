@@ -145,7 +145,18 @@ const PostComment = ({ attrs: { comment } }) => {
               hidden: cmt.collapsed
             },
             [
-              m('div.post-comment-text' + fixComment, commentHtml),
+              m(
+                'div.post-comment-text' + fixComment,
+                {
+                  onmousedown: e => {
+                    if (e.target.pathname && e.target.pathname.startsWith('/r/')) {
+                      window.open(location.pathname + '#!' + e.target.pathname)
+                      return false
+                    }
+                  }
+                },
+                commentHtml
+              ),
               cmt.replies
                 ? m(
                     'div.post-comment-replies',
