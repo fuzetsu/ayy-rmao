@@ -61,7 +61,7 @@ const PostComment = ({ attrs: { comment } }) => {
       if (!newCmt || !newCmt.data) return
       // normalize comment depth (will always start from 0 so set based on current depth)
       setDepth(newCmt.data, cmt.depth)
-      _.mergeWith(cmt, newCmt.data, (o, i, key) => (key === 'collapsed' ? o : i))
+      Object.assign(cmt, newCmt.data)
       m.redraw()
     })
   }

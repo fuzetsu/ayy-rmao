@@ -1,5 +1,4 @@
 import { m } from './ext-deps.js'
-import 'https://unpkg.com/lodash@4'
 
 import { BORDERS, THEME_KEY, FILTER_KEY, NSFW_KEY } from './constants.js'
 import { storeGet, id, storeSet } from './util.js'
