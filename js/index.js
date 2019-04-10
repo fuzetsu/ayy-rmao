@@ -1,7 +1,7 @@
 import { m } from './ext-deps.js'
 import 'https://unpkg.com/lodash@4'
 
-import { BORDERS, THEME_KEY, FKEY } from './constants.js'
+import { BORDERS, THEME_KEY, FILTER_KEY, NSFW_KEY } from './constants.js'
 import { storeGet, id, storeSet } from './util.js'
 
 import Main from './cmp/main.js'
@@ -9,16 +9,13 @@ import { setNight } from './styles.js'
 
 export const state = {
   openPost: null,
-  posts: [],
   loading: false,
   borders: BORDERS.day,
   limit: 3,
-  viewed: [],
-  changingHash: false,
   subreddit: '',
-  nsfw: false,
-  filter: storeGet(FKEY) || '',
-  nightMode: storeGet(THEME_KEY)
+  nsfw: !!storeGet(NSFW_KEY),
+  filter: storeGet(FILTER_KEY) || '',
+  nightMode: !!storeGet(THEME_KEY)
 }
 
 export const toggleTheme = () => {
@@ -46,4 +43,7 @@ window.addEventListener('hashchange', () => {
   }
 })
 
-m.mount(id('app'), Main)
+m.route(id('app'), '/', {
+  '/': Main,
+  '/r/:sub': Main
+})
