@@ -134,7 +134,7 @@ pl.Loading = {
 const PostPreview = {
   view({ attrs: { post, showInfo = true } }) {
     const comp = pl[post.type]
-    return m('.post-preview' + b`m 5 auto 15 auto`, [
+    return m('.post-preview' + b`m 5 auto 40 auto`, [
       showInfo ? m(PostInfo, { post }) : '',
       post.parseAsync ? m(pl.Loading, { post }) : m(comp, { post })
     ])
