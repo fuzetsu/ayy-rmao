@@ -5,7 +5,6 @@ import {
   LOAD_NUM,
   ADD_MORE_THRESHOLD,
   UNICODE,
-  LOADING_IMG,
   NSFW_KEY
 } from '../constants.js'
 import { getPosts } from '../api.js'
@@ -13,6 +12,7 @@ import { m, b } from '../ext-deps.js'
 import { storeSet, throttle } from '../util.js'
 import { PostCommentsModal } from './post-comments.js'
 import PostList from './post-list.js'
+import { loadingImg } from '../view-util.js'
 
 const Main = () => {
   const loadPosts = (append = false) => {
@@ -154,7 +154,7 @@ const Main = () => {
           ),
           state.openPost ? m(PostCommentsModal) : '',
           m(PostList, { posts }),
-          state.loading && m('div' + b`ta center`, m('img', { src: LOADING_IMG }))
+          state.loading && m('div' + b`ta center`, loadingImg())
         ]
       )
     }

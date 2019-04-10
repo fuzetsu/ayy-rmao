@@ -1,13 +1,14 @@
 import { m, b } from '../ext-deps.js'
-import { COMMENT_LOAD_NUM, API_URL, LOADING_IMG } from '../constants.js'
+import { COMMENT_LOAD_NUM, API_URL } from '../constants.js'
 import { state } from '../index.js'
 import { pluralize } from '../util.js'
+import { loadingImg } from '../view-util.js';
 
 const LoadMoreComments = () => {
   let loading = false
   return {
     view(vnode) {
-      if (loading) return m('div' + b`ta center`, m('img', { src: LOADING_IMG }))
+      if (loading) return m('div' + b`ta center`, loadingImg())
       const args = vnode.attrs
       const mc = args.moreComments
       const count = mc.children && mc.children.length

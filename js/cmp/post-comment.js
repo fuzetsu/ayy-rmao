@@ -1,13 +1,37 @@
 /* globals _ */
 import { m, b } from '../ext-deps.js'
 import { processRedditHtml, prettyTime, anim } from '../util.js'
-import { postCommentRefresh, postCommentRefreshContent, fixComment } from '../styles.js'
 
 import { getComments } from '../api.js'
 import { API_URL } from '../constants.js'
 import { state } from '../index.js'
 
 import LoadMoreComments from './load-more-comments.js'
+
+const postCommentRefresh = b`
+  background #ddd
+  border-radius 15
+  width 25
+  fs small
+  display inline-block
+  text-align center
+  box-sizing border-box
+  color black
+  cursor pointer
+  user-select none
+`
+
+const fixComment = b`word-break break-word`
+  .$nest(
+    ' blockquote',
+    `
+      pl 8
+      bl 4px solid #a2a2a2
+      m 4 0 4 8
+    `
+  )
+  .$nest('blockquote:last-child', 'mb 0')
+  .$nest('p', 'margin 0.75em 0')
 
 const PostComment = ({ attrs: { comment } }) => {
   let isRefreshing = false
@@ -106,7 +130,7 @@ const PostComment = ({ attrs: { comment } }) => {
                 onclick: () => refreshComment(cmt)
               },
               m(
-                'span' + postCommentRefreshContent,
+                'span' + b`d inline-block;ta center`,
                 {
                   oncreate: ({ dom }) => (refreshIndDom = dom),
                   class: isRefreshing ? b.spinAnimation : ''

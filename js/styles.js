@@ -3,6 +3,7 @@ import { b } from './ext-deps.js'
 // b.setDebug(true)
 
 const dayMode = `
+  --loading-filter 1
   --link-color #1b3e92
   --author-color #215854
   --op-color #1a1abd
@@ -19,6 +20,7 @@ const dayMode = `
 `
 
 const nightMode = `
+  --loading-filter 0
   --link-color #ffc9c9
   --author-color #ddd
   --op-color #afafff
@@ -76,33 +78,3 @@ b.helper({
     to: 'transform rotate(360deg)'
   })
 })
-
-export const fixComment = b`word-break break-word`
-  .$nest(
-    ' blockquote',
-    `
-      pl 8
-      bl 4px solid #a2a2a2
-      m 4 0 4 8
-    `
-  )
-  .$nest(' blockquote:last-child', 'mb 0')
-  .$nest('p', 'margin 0.75em 0')
-
-export const postCommentRefresh = b`
-  background #ddd
-  border-radius 15
-  height 16
-  width 25
-  display inline-block
-  text-align center
-  box-sizing border-box
-  color black
-  cursor pointer
-  user-select none
-`
-
-export const postCommentRefreshContent = b`
-  display inline-block
-  ta center
-`

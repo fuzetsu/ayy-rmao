@@ -1,8 +1,8 @@
 import { m, b } from '../ext-deps.js'
 
-import { LOADING_IMG } from '../constants.js'
 import { getComments } from '../api.js'
 import { state } from '../index.js'
+import { loadingImg } from '../view-util.js'
 
 import Modal from './modal.js'
 import PostInfo from './post-info.js'
@@ -22,7 +22,7 @@ const PostComments = ({ attrs: { post } }) => {
   return {
     view: () =>
       loading
-        ? m('div' + b`ta center`, m('img', { src: LOADING_IMG }))
+        ? m('div' + b`ta center`, loadingImg())
         : m('div.post-comments' + b`ta left`, [
             m(
               'div.post-comments-list',
