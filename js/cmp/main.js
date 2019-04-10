@@ -157,7 +157,6 @@ const Main = {
         class: state.openPost ? b`overflow hidden;pr 20` : ''
       },
       [
-        m('h1.page-title' + b`fs var(--title-text)`, 'Ayy Rmao'),
         m(
           'div.theme-changer' +
             b`
@@ -173,28 +172,32 @@ const Main = {
           state.nightMode ? UNICODE.moon : UNICODE.sun
         ),
         m(
-          'form' +
-            b
-              .$nest(' > *', 'd block;m 0 auto 7 auto')
-              .$nest(' input[type=text]', 'ta center;br 4;border none;p 5;fs var(--large-text)'),
-          { onsubmit: e => this.handleSubmit(e) },
-          m('input[type=text][placeholder=subreddit]', {
-            onchange: withAttrNoRedraw('value', v => (this.subreddit = v)),
-            value: this.subreddit,
-            autofocus: !this.subreddit
-          }),
-          m('input[type=text][placeholder=filter]', {
-            onchange: withAttrNoRedraw('value', v => (this.filter = v)),
-            value: this.filter
-          }),
-          m('label' + b`mb 40`, [
-            m('input[type=checkbox]', {
-              onclick: withAttrNoRedraw('checked', v => (this.nsfw = v)),
-              checked: this.nsfw
+          'div' + b`mt ${this.posts.length ? '10' : '15%'};transition margin-top 1s ease`,
+          m('h1.page-title' + b`fs var(--title-text)`, 'Ayy Rmao'),
+          m(
+            'form' +
+              b
+                .$nest(' > *', 'd block;m 0 auto 7 auto')
+                .$nest(' input[type=text]', 'ta center;br 4;border none;p 5;fs var(--large-text)'),
+            { onsubmit: e => this.handleSubmit(e) },
+            m('input[type=text][placeholder=subreddit]', {
+              onchange: withAttrNoRedraw('value', v => (this.subreddit = v)),
+              value: this.subreddit,
+              autofocus: !this.subreddit
             }),
-            m('span', 'nsfw?')
-          ]),
-          m('button[type=submit]' + b`d none`)
+            m('input[type=text][placeholder=filter]', {
+              onchange: withAttrNoRedraw('value', v => (this.filter = v)),
+              value: this.filter
+            }),
+            m('label' + b`mb 40`, [
+              m('input[type=checkbox]', {
+                onclick: withAttrNoRedraw('checked', v => (this.nsfw = v)),
+                checked: this.nsfw
+              }),
+              m('span', 'nsfw?')
+            ]),
+            m('button[type=submit]' + b`d none`)
+          )
         ),
         state.openPost ? m(PostCommentsModal) : '',
         this.loading
