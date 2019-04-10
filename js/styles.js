@@ -73,7 +73,7 @@ b.helper({
   })
 })
 
-export const fixComment = b
+export const fixComment = b`word-break break-word`
   .$nest(
     ' blockquote',
     `

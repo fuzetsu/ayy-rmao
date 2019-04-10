@@ -183,7 +183,7 @@ const Main = {
             value: this.subreddit,
             autofocus: !this.subreddit
           }),
-          m('input[type=text][placeholdenr=filter]', {
+          m('input[type=text][placeholder=filter]', {
             onchange: withAttrNoRedraw('value', v => (this.filter = v)),
             value: this.filter
           }),
