@@ -16,6 +16,7 @@ import PostList from './post-list.js'
 
 const Main = () => {
   const loadPosts = (append = false) => {
+    m.route.set(state.subreddit ? '/r/' + state.subreddit : '')
     if (!state.subreddit) return resetPosts()
     if (!append) resetPosts()
     state.loading = true
