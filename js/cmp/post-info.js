@@ -31,14 +31,7 @@ const PostInfo = {
         m('span', [
           m(
             'a' + b`c #ff5b5b`,
-            {
-              href: `#subreddit is ${post.subreddit} and nsfw is ${
-                state.nsfw ? 'enabled' : 'disabled'
-              }`,
-              onclick: e => {
-                if (e.button === 0) setTimeout(() => location.reload(), 200)
-              }
-            },
+            { href: '/r/' + post.subreddit, oncreate: m.route.link },
             post.subreddit
           )
         ])

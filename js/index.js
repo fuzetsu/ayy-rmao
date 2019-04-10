@@ -37,5 +37,5 @@ window.addEventListener('keydown', e => {
 
 m.route(id('app'), '/', {
   '/': Main,
-  '/r/:sub': Main
+  '/r/:key': Main
 })

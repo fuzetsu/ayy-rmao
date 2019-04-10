@@ -16,7 +16,6 @@ import PostList from './post-list.js'
 
 const Main = () => {
   const loadPosts = (append = false) => {
-    m.route.set(state.subreddit ? '/r/' + state.subreddit : '')
     if (!state.subreddit) return resetPosts()
     if (!append) resetPosts()
     state.loading = true
@@ -62,7 +61,7 @@ const Main = () => {
   }
 
   const handleEnter = e => {
-    if (e.key === 'Enter') loadPosts()
+    if (e.key === 'Enter') m.route.set(state.subreddit ? '/r/' + state.subreddit : '')
     else e.redraw = false
   }
 
@@ -73,7 +72,7 @@ const Main = () => {
   state.borders = state.nightMode ? BORDERS.night : BORDERS.day
 
   // read hash and load posts if appropriate
-  const sub = m.route.param('sub')
+  const sub = m.route.param('key')
   if (sub) {
     state.subreddit = sub
     loadPosts()

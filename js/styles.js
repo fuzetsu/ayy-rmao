@@ -14,6 +14,8 @@ const dayMode = `
   --text-color #444
   --bg-color #eee
   --bg-color-lighter #fff
+  --scroll-track-color #e0e0e0
+  --scroll-thumb-color #aaa
 `
 
 const nightMode = `
@@ -28,6 +30,8 @@ const nightMode = `
   --text-color white
   --bg-color #222
   --bg-color-lighter #444
+  --scroll-track-color #444
+  --scroll-thumb-color #555
 `
 
 export const setNight = on => b.css('html', on ? nightMode : dayMode)
