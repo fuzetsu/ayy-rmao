@@ -154,9 +154,8 @@ const Main = () => {
             )
           ),
           state.openPost ? m(PostCommentsModal) : '',
-          state.loading
-            ? m('div' + b`ta center`, m('img', { src: LOADING_IMG }))
-            : m(PostList, { posts })
+          m(PostList, { posts }),
+          state.loading && m('div' + b`ta center`, m('img', { src: LOADING_IMG }))
         ]
       )
     }
