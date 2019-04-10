@@ -17,17 +17,17 @@ const dayMode = `
 `
 
 const nightMode = `
---link-color #ffc9c9
---author-color #ddd
---op-color #afafff
---mod-color #34ce34
---admin-color red
---good-score-color rgb(255, 181, 45)
---bad-score-color rgb(0, 181, 247)
---score-hidden-color #aaa
---text-color white
---bg-color #222
---bg-color-lighter #444
+  --link-color #ffc9c9
+  --author-color #ddd
+  --op-color #afafff
+  --mod-color #34ce34
+  --admin-color red
+  --good-score-color rgb(255, 181, 45)
+  --bad-score-color rgb(0, 181, 247)
+  --score-hidden-color #aaa
+  --text-color white
+  --bg-color #222
+  --bg-color-lighter #444
 `
 
 export const setNight = on => b.css('html', on ? nightMode : dayMode)

@@ -35,14 +35,6 @@ window.addEventListener('keydown', e => {
   }
 })
 
-window.addEventListener('hashchange', () => {
-  if (!state.changingHash) {
-    location.reload()
-  } else {
-    state.changingHash = false
-  }
-})
-
 m.route(id('app'), '/', {
   '/': Main,
   '/r/:sub': Main
