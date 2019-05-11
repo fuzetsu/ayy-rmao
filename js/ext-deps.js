@@ -1,2 +1,4 @@
-export { default as b } from 'https://unpkg.com/bss/bss.esm.js'
+import z from 'https://unpkg.com/zaftig'
+// z.setDebug(true)
+export { z }
 export { default as m } from 'https://unpkg.com/mithril@next/mithril.mjs'

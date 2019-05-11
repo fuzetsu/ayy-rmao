@@ -1,4 +1,4 @@
-import { m, b } from '../ext-deps.js'
+import { m, z } from '../ext-deps.js'
 
 import { getComments } from '../api.js'
 import { state } from '../index.js'
@@ -22,12 +22,12 @@ const PostComments = ({ attrs: { post } }) => {
   return {
     view: () =>
       loading
-        ? m('div' + b`ta center`, loadingImg())
-        : m('div.post-comments' + b`ta left`, [
+        ? m('div' + z`ta center`, loadingImg())
+        : m('div.post-comments' + z`ta left`, [
             m(
               'div.post-comments-list',
               comments.length < 1
-                ? m('div' + b`ta center`, 'No comments yet...')
+                ? m('div' + z`ta center`, 'No comments yet...')
                 : comments.map((c, _idx, arr) => {
                     if (c.kind === 'more')
                       return m(LoadMoreComments, { parentArray: arr, moreComments: c.data })
@@ -45,9 +45,9 @@ export const PostCommentsModal = {
     const post = state.openPost
     return m(Modal, {
       onclose: this.onclose,
-      header: m('div' + b`ta center`, m(PostInfo, { post, readOnly: true })),
+      header: m('div' + z`ta center`, m(PostInfo, { post, readOnly: true })),
       content: [
-        m('div' + b`ta center`, m(PostPreview, { post, showInfo: false })),
+        m('div' + z`ta center`, m(PostPreview, { post, showInfo: false })),
         m(PostComments, { post })
       ]
     })

@@ -8,7 +8,7 @@ import {
   NSFW_KEY
 } from '../constants.js'
 import { getPosts } from '../api.js'
-import { m, b } from '../ext-deps.js'
+import { m, z } from '../ext-deps.js'
 import { storeSet, throttle } from '../util.js'
 import { PostCommentsModal } from './post-comments.js'
 import PostList from './post-list.js'
@@ -90,15 +90,15 @@ const Main = () => {
       }
       lastLimit = state.limit
       return m(
-        'main' + b`pin;ta center;overflow auto`,
+        'main' + z`pin;ta center;overflow auto`,
         {
           onscroll: throttle(250, e => handleScroll(e)),
-          class: state.openPost ? b`overflow hidden;pr 20` : ''
+          class: state.openPost ? z`overflow hidden;pr 20` : ''
         },
         [
           m(
             'div.theme-changer' +
-              b`
+              z`
               position fixed;t 5;r 25
               cursor pointer
               user-select none
@@ -106,21 +106,23 @@ const Main = () => {
             `,
             {
               onclick: () => toggleTheme(),
-              class: atPageTop ? '' : b`fade 0`.$hover`fade 1`
+              class: atPageTop ? '' : z`fade 0; :hover { fade 1 }`
             },
             state.nightMode ? UNICODE.moon : UNICODE.sun
           ),
           m(
-            'div' + b`mt ${posts.length ? '10' : '15%'};transition margin-top 1s ease`,
-            m('h1.page-title' + b`fs var(--title-text)`, 'Ayy Rmao'),
+            'div' + z`mt ${posts.length ? '10' : '15%'};transition margin-top 1s ease`,
+            m('h1.page-title' + z`fs var(--title-text)`, 'Ayy Rmao'),
             m(
               'div' +
-                b
-                  .$nest(' > *', 'd block;m 0 auto 7 auto')
-                  .$nest(
-                    ' input[type=text]',
-                    'ta center;br 4;border none;p 5;fs var(--large-text)'
-                  ),
+                z`
+                > * { d block;m 0 auto 7 auto }
+                > input[type=text] {
+                  ta center
+                  p 5;br 4;border none
+                  fs var(--large-text)
+                }
+              `,
               m('input[type=text][placeholder=subreddit]', {
                 oninput: e => (state.subreddit = e.target.value),
                 onkeydown: handleEnter,
@@ -144,7 +146,7 @@ const Main = () => {
               ])
             ),
             m(
-              'p' + b`fs var(--small-text);mb 40`,
+              'p' + z`fs var(--small-text);mb 40px`,
               failed
                 ? 'Failed to load subreddit. Please check name and try again.'
                 : !state.subreddit
@@ -154,7 +156,7 @@ const Main = () => {
           ),
           state.openPost ? m(PostCommentsModal) : '',
           m(PostList, { posts }),
-          state.loading && m('div' + b`ta center`, loadingImg())
+          state.loading && m('div' + z`ta center`, loadingImg())
         ]
       )
     }

@@ -1,6 +1,4 @@
-import { b } from './ext-deps.js'
-
-// b.setDebug(true)
+import { z } from './ext-deps.js'
 
 const dayMode = `
   --loading-filter 1
@@ -36,10 +34,10 @@ const nightMode = `
   --scroll-thumb-color #555
 `
 
-export const setNight = on => b.css('html', on ? nightMode : dayMode)
+export const setNight = on => z.global`html, body { ${on ? nightMode : dayMode} }`
 
-b.css({
-  html: `
+z.global`
+  html, body {
     --small-text 0.8em
     --large-text 1.2em
     --title-text 1.5em
@@ -47,17 +45,21 @@ b.css({
     c var(--text-color)
     bc var(--bg-color)
     ff "Segoe UI",Roboto,Oxygen,Ubuntu,"Droid Sans",sans-serif
-  `,
-  '*': 'box-sizing border-box',
-  a: 'td none;c var(--link-color)',
-  'a:hover': 'td underline'
-})
+  }
+  * { box-sizing border-box }
+  a {
+    td none
+    c var(--link-color)
+    :hover { td underline }
+  }
+`
 
-b.helper({
+z.helper({
   pin: 'position absolute;t 0;b 0;l 0;r 0',
-  fade: num => b`transition opacity 500ms;opacity ${num}`,
-  grow: num => b`transition transform 500ms;transform scale(${num})`,
+  fade: num => `transition opacity 500ms;opacity ${num}`,
+  grow: num => `transition transform 500ms;transform scale(${num})`,
   flexCenter: 'd flex;jc center;ai center',
+  fd: val => `flex-direction ${val}`,
   badge: `
     br 4
     d inline-block
@@ -73,8 +75,11 @@ b.helper({
     overflow hidden
     text-overflow ellipsis
   `,
-  spinAnimation: b.$animate('1s linear infinite', {
-    from: 'transform rotate(0deg)',
-    to: 'transform rotate(360deg)'
-  })
+  spinAnimation: `
+    animation spin 1s linear infinite
+    @keyframes spin {
+      from { transform rotate(0deg) }
+      to { transform rotate(360deg) }
+    }
+  `
 })

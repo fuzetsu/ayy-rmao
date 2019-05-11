@@ -1,5 +1,5 @@
 import { toggleExpand, processRedditHtml } from '../util.js'
-import { m, b } from '../ext-deps.js'
+import { m, z } from '../ext-deps.js'
 import { API_URL, IMAGES } from '../constants.js'
 import PostInfo from './post-info.js'
 
@@ -28,7 +28,7 @@ pl.Video = ({ attrs: { post } }) => {
       m('.video-post', [
         m(
           'video[loop][preload=metadata]' +
-            b`cursor row-resize;fade 0.25;max-width 99%;max-height 95vh`.$hover`fade 1;z-index 50`,
+            z`cursor row-resize;fade 0.25;max-width 99%;max-height 95vh; :hover { fade 1;z-index 50 }`,
           {
             onmouseenter: play,
             onmouseleave: pause,
@@ -44,7 +44,7 @@ pl.Image = {
   view: ({ attrs: { post } }) =>
     m(
       '.image-post',
-      m('img' + b`cursor row-resize;max-width 99%;max-height 95vh`, {
+      m('img' + z`cursor row-resize;max-width 99%;max-height 95vh`, {
         src: post.url,
         onclick: e => toggleExpand('width', e)
       })
@@ -61,9 +61,9 @@ pl.Embed = () => {
       }
       return m('.embed-post', [
         loaded
-          ? m('iframe[frameborder=0]' + b`h 90vh;w 90%`, { src })
+          ? m('iframe[frameborder=0]' + z`h 90vh;w 90%`, { src })
           : m(
-              'button.load-embed' + b`p 10 15;m 7 0`,
+              'button.load-embed' + z`p 10 15;m 7 0`,
               { onclick: () => (loaded = true) },
               'Load ',
               post.desc || 'Embedded Content'
@@ -77,7 +77,7 @@ const SelfPost = {
   view: ({ attrs: { post }, children }) =>
     m(
       '.self-post' +
-        b`
+        z`
         w 750
         max-width 80%
         ta left
@@ -87,11 +87,11 @@ const SelfPost = {
         m auto
       `,
       m(
-        '.self-post-username' + b`fw bold;position relative;t 8;l 13`,
+        '.self-post-username' + z`fw bold;position relative;t 8;l 13`,
         m('a[target=_blank].link', { href: `${API_URL}/u/${post.author}` }, post.author),
         ' says: '
       ),
-      m('.self-post-content' + b`p 20 30 30 30`, children)
+      m('.self-post-content' + z`p 30;pt 20`, children)
     )
 }
 
@@ -108,7 +108,7 @@ pl.Link = {
       SelfPost,
       { post },
       m(
-        'div' + b`ta center`,
+        'div' + z`ta center`,
         m('a[target=_blank]', { href: post.url }, post.url),
         post.thumbnail.indexOf('http') === 0 ? [m('br'), m('img', { src: post.thumbnail })] : ''
       )
@@ -134,7 +134,7 @@ pl.Loading = {
 const PostPreview = {
   view({ attrs: { post, showInfo = true } }) {
     const comp = pl[post.type]
-    return m('.post-preview' + b`m 5 auto 40 auto`, [
+    return m('.post-preview' + z`m 5 auto 40 auto`, [
       showInfo ? m(PostInfo, { post }) : '',
       post.parseAsync ? m(pl.Loading, { post }) : m(comp, { post })
     ])
