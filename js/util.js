@@ -87,3 +87,5 @@ export const anim = (dom, cb, type = 'end', unbind = true) => {
   }
   dom.addEventListener('animation' + type, handler)
 }
+
+export const doWith = (...args) => fn => fn(...args)
