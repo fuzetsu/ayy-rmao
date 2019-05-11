@@ -65,11 +65,11 @@ const PostComment = ({ attrs: { comment } }) => {
   }
   const getAuthorStyle = cmt =>
     cmt.is_submitter
-      ? z`content '[OP]'; c var(--op-color)`
+      ? "content '[OP]'; c var(--op-color)"
       : cmt.distinguished === 'moderator'
-      ? z`content '[MOD]'; c var(--mod-color)`
+      ? "content '[MOD]'; c var(--mod-color)"
       : cmt.distinguished === 'admin'
-      ? z`content '[ADMIN]'; c var(--admin-color)`
+      ? "content '[ADMIN]'; c var(--admin-color)"
       : null
   return {
     view: ({ attrs: { comment: cmt } }) => {
