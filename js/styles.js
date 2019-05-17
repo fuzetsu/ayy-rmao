@@ -52,6 +52,15 @@ z.global`
     c var(--link-color)
     :hover { td underline }
   }
+  @media only screen and (min-device-width: 900px) {
+    ::-webkit-scrollbar { w 15 }
+    ::-webkit-scrollbar-track {
+      bs inset 0 0 2 rgba(0, 0, 0, 0.3)
+      bc var(--scroll-track-color)
+    }
+    .modal ::-webkit-scrollbar-track { bbrr 10 }
+    ::-webkit-scrollbar-thumb { bc var(--scroll-thumb-color) }
+  }
 `
 
 z.helper({

@@ -1,5 +1,6 @@
 import { m, z } from '../ext-deps.js'
 import { processRedditHtml, prettyTime, anim } from '../util.js'
+import { externalLink } from '../view-util.js'
 
 import { getComments } from '../api.js'
 import { API_URL } from '../constants.js'
@@ -91,7 +92,8 @@ const PostComment = ({ attrs: { comment } }) => {
               '] '
             ),
             m(
-              'a[target=_blank].post-comment-author' +
+              externalLink +
+                '.post-comment-author' +
                 z`
                 c var(--author-color)
                 :after {
@@ -118,7 +120,7 @@ const PostComment = ({ attrs: { comment } }) => {
               editedAt ? [sep(), ' edited ', prettyTime(editedAt) || editedAt.toLocaleString()] : ''
             ),
             sep(),
-            m('a[target=_blank]', { href: API_URL + cmt.permalink }, 'permalink'),
+            m(externalLink, { href: API_URL + cmt.permalink }, 'permalink'),
             sep(),
             m(
               'span.post-comment-refresh[title=Refresh Comment Thread]' + postCommentRefresh,

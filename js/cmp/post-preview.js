@@ -1,4 +1,5 @@
 import { toggleExpand, processRedditHtml } from '../util.js'
+import { externalLink } from '../view-util.js'
 import { m, z } from '../ext-deps.js'
 import { API_URL, IMAGES } from '../constants.js'
 import PostInfo from './post-info.js'
@@ -88,7 +89,7 @@ const SelfPost = {
       `,
       m(
         '.self-post-username' + z`fw bold;position relative;t 8;l 13`,
-        m('a[target=_blank].link', { href: `${API_URL}/u/${post.author}` }, post.author),
+        m(externalLink, { href: `${API_URL}/u/${post.author}` }, post.author),
         ' says: '
       ),
       m('.self-post-content' + z`p 30;pt 20`, children)
@@ -109,7 +110,7 @@ pl.Link = {
       { post },
       m(
         'div' + z`ta center`,
-        m('a[target=_blank]', { href: post.url }, post.url),
+        m(externalLink, { href: post.url }, post.url),
         post.thumbnail.indexOf('http') === 0 ? [m('br'), m('img', { src: post.thumbnail })] : ''
       )
     )
