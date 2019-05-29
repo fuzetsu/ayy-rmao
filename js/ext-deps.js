@@ -1,6 +1,4 @@
 import z from 'https://unpkg.com/zaftig'
 z.setDebug(true)
 export { z }
-
-const m = window.m
-export { m }
+export { default as m } from 'https://unpkg.com/mithril@2.0.0-rc.4/mithril.mjs'
