@@ -140,7 +140,12 @@ const PostComment = ({ attrs: { comment } }) => {
               'div.post-comment-text' + fixComment,
               {
                 onmousedown: e => {
-                  if (e.target.pathname && e.target.pathname.startsWith('/r/')) {
+                  if (
+                    e.which === 1 &&
+                    e.target.pathname &&
+                    e.target.pathname.startsWith('/r/') &&
+                    !e.target.pathname.includes('/comments/')
+                  ) {
                     window.open(location.pathname + '#!' + e.target.pathname)
                     return false
                   }
