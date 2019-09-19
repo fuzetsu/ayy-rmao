@@ -11,9 +11,6 @@ export const LOAD_NUM = 3
 export const ADD_MORE_THRESHOLD = 10
 export const COMMENT_LOAD_NUM = 50
 export const REQUEST_NUM = 25
-export const FILTER_KEY = 'ayy-rmao-filter'
-export const THEME_KEY = 'ayy-rmao-night'
-export const NSFW_KEY = 'ayy-rmao-nsfw'
 
 export const BORDERS = {
   day: [

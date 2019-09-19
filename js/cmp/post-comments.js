@@ -1,7 +1,6 @@
 import { m, z } from '../ext-deps.js'
 
 import { getComments } from '../api.js'
-import { state } from '../index.js'
 import { loadingImg } from '../view-util.js'
 
 import Modal from './modal.js'
@@ -9,6 +8,8 @@ import PostInfo from './post-info.js'
 import PostComment from './post-comment.js'
 import LoadMoreComments from './load-more-comments.js'
 import PostPreview from './post-preview.js'
+import { state } from '../index.js'
+import { setOpen } from '../actions.js'
 
 const PostComments = ({ attrs: { post } }) => {
   let comments = []
@@ -40,7 +41,7 @@ const PostComments = ({ attrs: { post } }) => {
 export default PostComments
 
 export const PostCommentsModal = {
-  onclose: () => (state.openPost = null),
+  onclose: () => setOpen(null),
   view() {
     const post = state.openPost
     return m(Modal, {

@@ -1,65 +1,65 @@
 import { z } from './ext-deps.js'
 
 const dayMode = `
-  --loading-filter 1
-  --link-color #1b3e92
-  --author-color #215854
-  --op-color #1a1abd
-  --mod-color #109610
-  --admin-color red
-  --good-score-color #ff7a00
-  --bad-score-color #3070a9
-  --score-hidden-color #666
-  --text-color #444
-  --bg-color #eee
-  --bg-color-lighter #fff
-  --scroll-track-color #e0e0e0
-  --scroll-thumb-color #aaa
+  $loading-filter 1
+  $link-color #1b3e92
+  $author-color #215854
+  $op-color #1a1abd
+  $mod-color #109610
+  $admin-color red
+  $good-score-color #ff7a00
+  $bad-score-color #3070a9
+  $score-hidden-color #666
+  $text-color #444
+  $bg-color #eee
+  $bg-color-lighter #fff
+  $scroll-track-color #e0e0e0
+  $scroll-thumb-color #aaa
 `
 
 const nightMode = `
-  --loading-filter 0
-  --link-color #ffc9c9
-  --author-color #ddd
-  --op-color #afafff
-  --mod-color #34ce34
-  --admin-color red
-  --good-score-color rgb(255, 181, 45)
-  --bad-score-color rgb(0, 181, 247)
-  --score-hidden-color #aaa
-  --text-color white
-  --bg-color #222
-  --bg-color-lighter #444
-  --scroll-track-color #444
-  --scroll-thumb-color #555
+  $loading-filter 0
+  $link-color #ffc9c9
+  $author-color #ddd
+  $op-color #afafff
+  $mod-color #34ce34
+  $admin-color red
+  $good-score-color rgb(255, 181, 45)
+  $bad-score-color rgb(0, 181, 247)
+  $score-hidden-color #aaa
+  $text-color white
+  $bg-color #222
+  $bg-color-lighter #444
+  $scroll-track-color #444
+  $scroll-thumb-color #555
 `
 
 export const setNight = on => z.global`html, body { ${on ? nightMode : dayMode} }`
 
 z.global`
   html, body {
-    --small-text 0.8em
-    --large-text 1.2em
-    --title-text 1.5em
+    $small-text 0.8em
+    $large-text 1.2em
+    $title-text 1.5em
 
-    c var(--text-color)
-    bc var(--bg-color)
+    c $text-color
+    bc $bg-color
     ff "Segoe UI",Roboto,Oxygen,Ubuntu,"Droid Sans",sans-serif
   }
   * { box-sizing border-box }
   a {
     td none
-    c var(--link-color)
+    c $link-color
     :hover { td underline }
   }
   @media only screen and (min-device-width: 900px) {
     ::-webkit-scrollbar { w 15 }
     ::-webkit-scrollbar-track {
       bs inset 0 0 2 rgba(0, 0, 0, 0.3)
-      bc var(--scroll-track-color)
+      bc $scroll-track-color
     }
     .modal ::-webkit-scrollbar-track { bbrr 10 }
-    ::-webkit-scrollbar-thumb { bc var(--scroll-thumb-color) }
+    ::-webkit-scrollbar-thumb { bc $scroll-thumb-color }
   }
 `
 
@@ -85,10 +85,9 @@ z.helper({
     text-overflow ellipsis
   `,
   spinAnimation: `
-    animation spin 1s linear infinite
-    @keyframes spin {
+    animation ${z.anim`
       from { transform rotate(0deg) }
       to { transform rotate(360deg) }
-    }
+    `} 1s linear infinite
   `
 })

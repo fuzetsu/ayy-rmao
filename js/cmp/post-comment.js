@@ -9,8 +9,8 @@ import { state } from '../index.js'
 import LoadMoreComments from './load-more-comments.js'
 
 const postCommentRefresh = z`
-  background var(--text-color)
-  color var(--bg-color)
+  background $text-color
+  color $bg-color
   br 15
   width 25
   fs small
@@ -95,7 +95,7 @@ const PostComment = ({ attrs: { comment } }) => {
               externalLink +
                 '.post-comment-author' +
                 z`
-                c var(--author-color)
+                c $author-color
                 :after {
                   ff monospace
                   position relative
@@ -108,14 +108,14 @@ const PostComment = ({ attrs: { comment } }) => {
             ),
             sep(),
             cmt.score_hidden
-              ? m('em' + z`c var(--score-hidden-color)`, 'Score Hidden')
+              ? m('em' + z`c $score-hidden-color`, 'Score Hidden')
               : m(
-                  'span.score' + z`fw bold;c var(--${cmt.score >= 1 ? 'good' : 'bad'}-score-color)`,
+                  'span.score' + z`fw bold;c $${cmt.score >= 1 ? 'good' : 'bad'}-score-color`,
                   cmt.score
                 ),
             sep(),
             m(
-              'span' + z`c var(--score-hidden-color)`,
+              'span' + z`c $score-hidden-color)`,
               prettyTime(createdAt) || createdAt.toLocaleString(),
               editedAt ? [sep(), ' edited ', prettyTime(editedAt) || editedAt.toLocaleString()] : ''
             ),

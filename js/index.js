@@ -1,40 +1,56 @@
-import { m } from './ext-deps.js'
+import setup from 'https://unpkg.com/meiosis-setup@2/mergerino'
+import { m, merge, stream } from './ext-deps.js'
+import { id, safeParse } from './util.js'
 
-import { BORDERS, THEME_KEY, FILTER_KEY, NSFW_KEY } from './constants.js'
-import { storeGet, id, storeSet } from './util.js'
+import { BORDERS } from './constants.js'
 
 import Main from './cmp/main.js'
-import { setNight } from './styles.js'
 
-export const state = {
-  openPost: null,
-  loading: false,
-  borders: BORDERS.day,
-  limit: 3,
-  subreddit: '',
-  nsfw: !!storeGet(NSFW_KEY),
-  filter: storeGet(FILTER_KEY) || '',
-  nightMode: !!storeGet(THEME_KEY)
+import { setNightTheme } from './actions.js'
+
+const app = {
+  Initial: () => ({
+    nsfw: false,
+    filter: '',
+    nightMode: false,
+    ...safeParse(localStorage.ayyRmaov1),
+    openPost: null,
+    loading: false,
+    borders: BORDERS.day,
+    limit: 3,
+    subreddit: '',
+    posts: []
+  }),
+  services: [
+    ({ state }) =>
+      (localStorage.ayyRmaov1 = JSON.stringify(
+        merge(state, {
+          openPost: undefined,
+          posts: undefined,
+          subreddit: undefined
+        })
+      ))
+  ]
 }
 
-export const toggleTheme = () => {
-  state.nightMode = !state.nightMode
-  setNight(state.nightMode)
-  storeSet(THEME_KEY, state.nightMode)
-  state.borders = state.nightMode ? BORDERS.day : BORDERS.night
-}
+export let state
+export let update
 
-setNight(state.nightMode)
+setup({ merge, stream, app }).then(({ update: up, states }) => {
+  update = up
+  states.map(x => (state = x)).map(m.redraw)
 
-window.addEventListener('keydown', e => {
-  if (e.code === 'KeyN' && e.target.nodeName !== 'INPUT') {
-    e.preventDefault()
-    toggleTheme()
-    m.redraw()
-  }
-})
+  setNightTheme(state.nightMode)
 
-m.route(id('app'), '/', {
-  '/': Main,
-  '/r/:key': Main
+  window.addEventListener('keydown', e => {
+    if (e.code === 'KeyN' && e.target.nodeName !== 'INPUT') {
+      e.preventDefault()
+      setNightTheme()
+    }
+  })
+
+  m.route(id('app'), '/', {
+    '/': Main,
+    '/r/:key': Main
+  })
 })

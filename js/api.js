@@ -71,9 +71,9 @@ const postTypes = [
     type: 'Video',
     postParse: true,
     match: post => post.post_hint === 'hosted:video',
-    parse: post => {
+    parse: (post, res) => {
       const url = post.media.reddit_video.fallback_url
-      post.sound = url
+      res.sound = url
         .split('/')
         .slice(0, -1)
         .concat('audio')
@@ -140,7 +140,7 @@ const detectPostType = function(post) {
       baseAttrs.concat(type.fields || []).forEach(field => (npost[field] = post[field]))
       ;['type', 'parseAsync', 'desc'].forEach(field => (npost[field] = type[field]))
       npost.url = type.parse
-        ? type.parse(type.postParse ? post : type.strip === false ? post.url : url)
+        ? type.parse(type.postParse ? post : type.strip === false ? post.url : url, npost)
         : type.strip
         ? url
         : post.url

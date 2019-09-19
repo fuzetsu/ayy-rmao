@@ -2,7 +2,7 @@ import { m, z } from '../ext-deps.js'
 import { pluralize } from '../util.js'
 import { externalLink } from '../view-util.js'
 import { API_URL } from '../constants.js'
-import { state } from '../index.js'
+import { setOpen } from '../actions.js'
 
 const PostInfo = {
   view: ({ attrs: { post, readOnly = false } }) =>
@@ -16,7 +16,7 @@ const PostInfo = {
             onclick: function(e) {
               if (e.ctrlKey || readOnly) return
               e.preventDefault()
-              state.openPost = post
+              setOpen(post)
             }
           },
           m.trust(post.title)

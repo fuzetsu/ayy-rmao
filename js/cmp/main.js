@@ -1,54 +1,15 @@
-import { state, toggleTheme } from '../index.js'
-import {
-  BORDERS,
-  FIRST_LOAD_NUM,
-  LOAD_NUM,
-  ADD_MORE_THRESHOLD,
-  UNICODE,
-  NSFW_KEY
-} from '../constants.js'
-import { getPosts } from '../api.js'
+import { BORDERS, LOAD_NUM, ADD_MORE_THRESHOLD, UNICODE } from '../constants.js'
 import { m, z } from '../ext-deps.js'
-import { storeSet, throttle } from '../util.js'
+import { throttle } from '../util.js'
 import { PostCommentsModal } from './post-comments.js'
 import PostList from './post-list.js'
 import { loadingImg } from '../view-util.js'
 
+import { state } from '../index.js'
+import { setNightTheme, loadPosts, toggleNsfw, setSub, setFilter, resetPosts } from '../actions.js'
+
 const Main = () => {
-  const loadPosts = (append = false) => {
-    if (!state.subreddit) return resetPosts()
-    if (!append) resetPosts()
-    state.loading = true
-    failed = false
-    const after = posts.length > 0 ? posts[posts.length - 1].name : ''
-    getPosts(state.subreddit, after, state.nsfw)
-      // apply filter
-      .then(newPosts => {
-        if (!state.filter) return newPosts
-        const filtered = state.filter.split('+')
-        return newPosts.filter(post => !filtered.includes(post.subreddit))
-      })
-      // combine post lists
-      .then(
-        newPosts => {
-          posts = posts.concat(newPosts)
-          state.loading = false
-          m.redraw()
-        },
-        err => {
-          if (err) console.log(err)
-          state.loading = false
-          failed = true
-          m.redraw()
-        }
-      )
-  }
-
-  const resetPosts = () => {
-    posts = []
-    state.limit = FIRST_LOAD_NUM
-  }
-
+  let atPageTop = true
   const handleScroll = e => {
     const scrollTop = e.target.scrollTop
     const wasAtPageTop = atPageTop
@@ -65,35 +26,33 @@ const Main = () => {
     else e.redraw = false
   }
 
-  let atPageTop = true
-  let failed = false
-  let posts = []
   let lastLimit
   state.borders = state.nightMode ? BORDERS.night : BORDERS.day
 
   // read hash and load posts if appropriate
   const sub = m.route.param('key')
-  if (sub) {
-    state.subreddit = sub
-    loadPosts()
-  }
+  if (sub) loadPosts(sub)
+  else if (state.posts.length) resetPosts()
 
   return {
     view: () => {
+      const { posts, loading, nightMode, subreddit, filter, nsfw, failed, openPost, limit } = state
+
       if (
-        !state.loading &&
+        !loading &&
         posts.length > 0 &&
-        posts.length <= state.limit + ADD_MORE_THRESHOLD &&
-        state.limit !== lastLimit
+        posts.length <= limit + ADD_MORE_THRESHOLD &&
+        limit !== lastLimit
       ) {
-        loadPosts(true)
+        loadPosts(subreddit, true)
       }
-      lastLimit = state.limit
+      lastLimit = limit
+
       return m(
         'main' + z`pin;ta center;overflow auto`,
         {
           onscroll: throttle(250, e => handleScroll(e)),
-          class: state.openPost ? z`overflow hidden;pr 20` : ''
+          class: openPost ? z`overflow hidden;pr 20` : ''
         },
         [
           m(
@@ -105,10 +64,10 @@ const Main = () => {
               z-index 100
             `,
             {
-              onclick: () => toggleTheme(),
+              onclick: () => setNightTheme(),
               class: atPageTop ? '' : z`fade 0; :hover { fade 1 }`
             },
-            state.nightMode ? UNICODE.moon : UNICODE.sun
+            nightMode ? UNICODE.moon : UNICODE.sun
           ),
           m(
             'div' + z`mt ${posts.length ? '10' : '15%'};transition margin-top 1s ease`,
@@ -124,23 +83,20 @@ const Main = () => {
                 }
               `,
               m('input[type=text][placeholder=subreddit]', {
-                oninput: e => (state.subreddit = e.target.value),
+                oninput: e => setSub(e.target.value.trim()),
                 onkeydown: handleEnter,
-                value: state.subreddit,
-                autofocus: !state.subreddit
+                value: subreddit,
+                autofocus: !subreddit
               }),
               m('input[type=text][placeholder=filter]', {
-                oninput: e => (state.filter = e.target.value),
+                oninput: e => setFilter(e.target.value.trim()),
                 onkeydown: handleEnter,
-                value: state.filter
+                value: filter
               }),
               m('label', [
                 m('input[type=checkbox]', {
-                  onclick: () => {
-                    state.nsfw = !state.nsfw
-                    storeSet(NSFW_KEY, state.nsfw)
-                  },
-                  checked: state.nsfw
+                  onclick: () => (toggleNsfw(), loadPosts(subreddit)),
+                  checked: nsfw
                 }),
                 m('span', 'nsfw?')
               ])
@@ -149,14 +105,14 @@ const Main = () => {
               'p' + z`fs var(--small-text);mb 40px`,
               failed
                 ? 'Failed to load subreddit. Please check name and try again.'
-                : !state.subreddit
+                : !subreddit
                 ? 'Please enter a subreddit and press enter.'
                 : ''
             )
           ),
-          state.openPost ? m(PostCommentsModal) : '',
+          openPost ? m(PostCommentsModal) : '',
           m(PostList, { posts }),
-          state.loading && m('div' + z`ta center`, loadingImg())
+          loading && m('div' + z`ta center`, loadingImg())
         ]
       )
     }
