@@ -41,6 +41,32 @@ export const getComments = (post, comment) =>
     })
     .then(data => data[1].data.children)
 
+export const getMoreComments = (postName, ids) =>
+  m
+    .request({
+      method: 'GET',
+      url: `${API_URL}/api/morechildren.json`,
+      data: {
+        api_type: 'json',
+        children: ids.join(','),
+        link_id: postName
+      }
+    })
+    .then(data => {
+      if (
+        !data ||
+        !data.json ||
+        !data.json.data ||
+        !data.json.data.things ||
+        data.json.data.things.length <= 0
+      ) {
+        console.log('no comments to load :(', data && data.json && data.json.errors)
+        return []
+      }
+      return data.json.data.things
+    })
+    .catch(err => console.log(err))
+
 export const getPosts = (subreddit, after, nsfw) =>
   m
     .request({
