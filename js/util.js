@@ -100,6 +100,10 @@ export const safeParse = (json, fallback = {}) => {
 
 
 export const reduceCount = (count, digits = 1) => {
+  if (!count) {
+    return count
+  }
+
   let indicator = null
   let divisor = null
 
