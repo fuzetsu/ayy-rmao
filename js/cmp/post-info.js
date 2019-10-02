@@ -1,5 +1,5 @@
 import { m, z } from '../ext-deps.js'
-import { pluralize } from '../util.js'
+import { pluralize, reduceCount } from '../util.js'
 import { externalLink } from '../view-util.js'
 import { API_URL } from '../constants.js'
 import { setOpen } from '../actions.js'
@@ -23,11 +23,11 @@ const PostInfo = {
         )
       ]),
       m('.post-info' + z`mb 5; > span { fw bold }`, [
-        m('span' + z`c var(--${post.score > 0 ? 'good-score' : 'bad-score'}-color)`, post.score),
+        m('span' + z`c var(--${post.score > 0 ? 'good-score' : 'bad-score'}-color)`, reduceCount(post.score)),
         ' ',
         pluralize('point', post.score),
         ' and ',
-        m('span' + z`c rgb(0, 167, 228)`, post.num_comments),
+        m('span' + z`c rgb(0, 167, 228)`, reduceCount(post.num_comments)),
         ' comments on ',
         m('span', [
           m(
