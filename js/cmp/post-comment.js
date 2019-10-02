@@ -1,5 +1,5 @@
 import { m, z } from '../ext-deps.js'
-import { processRedditHtml, prettyTime, anim } from '../util.js'
+import { processRedditHtml, prettyTime, anim, reduceCount } from '../util.js'
 import { externalLink } from '../view-util.js'
 
 import { getComments } from '../api.js'
@@ -111,7 +111,7 @@ const PostComment = ({ attrs: { comment } }) => {
               ? m('em' + z`c $score-hidden-color`, 'Score Hidden')
               : m(
                   'span.score' + z`fw bold;c $${cmt.score >= 1 ? 'good' : 'bad'}-score-color`,
-                  cmt.score
+                  reduceCount(cmt.score)
                 ),
             sep(),
             m(

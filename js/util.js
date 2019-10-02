@@ -97,3 +97,20 @@ export const safeParse = (json, fallback = {}) => {
     return fallback
   }
 }
+
+
+export const reduceCount = (count, digits = 1) => {
+  let indicator = null
+  let divisor = null
+
+  if (count > 999999) {
+    indicator = 'M'
+    divisor = 1000000
+  } else if (count > 999) {
+    indicator = 'k'
+    divisor = 1000
+  }
+
+  // Do not reduce if we are below 1000
+  return divisor ? `${(count / divisor).toFixed(digits)}${indicator}` : count;
+}
