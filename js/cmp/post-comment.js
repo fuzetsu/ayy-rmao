@@ -21,7 +21,7 @@ const postCommentRefresh = z`
   user-select none
 `
 
-const fixComment = z`
+const commentContents = z`
   word-break break-word
   blockquote {
     pl 8
@@ -30,6 +30,7 @@ const fixComment = z`
   }
   blockquote:last-child { mb 0 }
   p { margin 0.75em 0 }
+  pre { white-space pre-wrap }
 `
 
 const PostComment = ({ attrs: { comment } }) => {
@@ -137,7 +138,7 @@ const PostComment = ({ attrs: { comment } }) => {
           ]),
           m('div', { hidden: cmt.collapsed }, [
             m(
-              'div.post-comment-text' + fixComment,
+              'div.post-comment-text' + commentContents,
               {
                 onmousedown: e => {
                   if (
