@@ -1,6 +1,6 @@
-import z from 'https://unpkg.com/zaftig@0.7/dist/zaftig.min.js'
-z.setDebug(true)
-export { z }
-export { default as merge } from 'https://unpkg.com/mergerino@0.4/dist/mergerino.min.js'
-export { default as m } from 'https://unpkg.com/mithril@2.0.0-rc.4/mithril.mjs'
-export { default as stream } from 'https://unpkg.com/meiosis-setup@2/simple-stream'
+export { default as merge } from 'https://unpkg.com/mergerino@0.4.0/dist/mergerino.min.js?module'
+
+export { default as z } from 'https://unpkg.com/zaftig@0.7.3/dist/zaftig.min.js?module'
+
+export { stream, scan } from 'https://unpkg.com/meiosis-setup@2.0.0/simple-stream/index.js?module'
+export { default as simpleStream } from 'https://unpkg.com/meiosis-setup@2.0.0/simple-stream/index.js?module'
