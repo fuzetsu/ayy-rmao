@@ -15,8 +15,12 @@
   "bugs": {
     "url": "https://github.com/fuzetsu/ayy-rmao/issues"
   },
-  "extdeps": {
+  "mdeps": {
     "./js/ext-deps.js": {
+      "mithril@2.0.0-rc.4": {
+        "name": "m",
+        "exports": []
+      },
       "mergerino@0.4": {
         "name": "merge",
         "exports": []
@@ -25,12 +29,13 @@
         "name": "z",
         "exports": []
       },
+      "meiosis-setup@2/mergerino": {
+        "exports": [],
+        "name": "setupMeiosis"
+      },
       "meiosis-setup@2/simple-stream": {
-        "name": "simpleStream",
-        "exports": [
-          "stream",
-          "scan"
-        ]
+        "name": "stream",
+        "exports": []
       }
     }
   },
