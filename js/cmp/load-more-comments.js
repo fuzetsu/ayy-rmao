@@ -3,14 +3,13 @@ import { COMMENT_LOAD_NUM, API_URL } from '../constants.js'
 import { state } from '../index.js'
 import { pluralize } from '../util.js'
 import { loadingImg } from '../view-util.js'
+import { getMoreComments } from '../api.js'
 
 const LoadMoreComments = () => {
   let loading = false
   return {
-    view(vnode) {
+    view({ attrs: { parentArray, moreComments: mc } }) {
       if (loading) return m('div' + z`ta center`, loadingImg())
-      const args = vnode.attrs
-      const mc = args.moreComments
       const count = mc.children && mc.children.length
       // dont show button if no comments to load...
       if (count <= 0) return ''
@@ -21,64 +20,41 @@ const LoadMoreComments = () => {
             e.preventDefault()
             loading = true
             const childrenToLoad = mc.children.splice(0, COMMENT_LOAD_NUM)
-            m.request({
-              method: 'GET',
-              url: API_URL + '/api/morechildren.json',
-              data: {
-                api_type: 'json',
-                children: childrenToLoad.join(','),
-                link_id: state.openPost.name
-              }
-            }).then(
-              data => {
-                loading = false
-                console.log('more comments => ', data)
-                if (
-                  !data ||
-                  !data.json ||
-                  !data.json.data ||
-                  !data.json.data.things ||
-                  data.json.data.things.length <= 0
-                ) {
-                  console.log(
-                    'didnt get more comments to load :(',
-                    data && data.json && data.json.errors
-                  )
-                  return
+            getMoreComments(state.openPost.name, childrenToLoad).then(data => {
+              loading = false
+              if (!data.length) return
+              console.log('more comments => ', data)
+              // detach load more button
+              let loadMoreButton
+              parentArray.some((c, idx) => {
+                if (c.kind === 'more' && c.data.id === mc.id) {
+                  loadMoreButton = parentArray.splice(idx, 1)[0]
+                  return true
                 }
-                // detach load more button
-                let loadMoreButton
-                args.parentArray.some((c, idx) => {
-                  if (c.kind === 'more' && c.data.id === mc.id) {
-                    loadMoreButton = args.parentArray.splice(idx, 1)[0]
-                    return true
-                  }
-                })
-                // add in new comments
-                const lastCommentAtDepth = {}
-                data.json.data.things.forEach(cmt => {
-                  if (cmt.data.depth === mc.depth) {
-                    args.parentArray.push(cmt)
-                  } else {
-                    const parentComment = lastCommentAtDepth[cmt.data.depth - 1]
-                    if (!parentComment) return
-                    parentComment.data.replies = parentComment.data.replies || {
-                      kind: 'Listing',
-                      data: {
-                        children: []
-                      }
+              })
+              // add in new comments
+              const lastCommentAtDepth = {}
+              data.forEach(cmt => {
+                if (cmt.data.depth === mc.depth) {
+                  parentArray.push(cmt)
+                } else {
+                  const parentComment = lastCommentAtDepth[cmt.data.depth - 1]
+                  if (!parentComment) return
+                  parentComment.data.replies = parentComment.data.replies || {
+                    kind: 'Listing',
+                    data: {
+                      children: []
                     }
-                    parentComment.data.replies.data.children.push(cmt)
                   }
-                  lastCommentAtDepth[cmt.data.depth] = cmt
-                })
-                // re-add load more button if necessary
-                if (mc.children.length > 0 && loadMoreButton) {
-                  args.parentArray.push(loadMoreButton)
+                  parentComment.data.replies.data.children.push(cmt)
                 }
-              },
-              err => console.log(err)
-            )
+                lastCommentAtDepth[cmt.data.depth] = cmt
+              })
+              // re-add load more button if necessary
+              if (mc.children.length > 0 && loadMoreButton) {
+                parentArray.push(loadMoreButton)
+              }
+            })
           }
         },
         'Load ',

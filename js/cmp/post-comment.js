@@ -1,5 +1,5 @@
 import { m, z } from '../ext-deps.js'
-import { processRedditHtml, prettyTime, anim } from '../util.js'
+import { processRedditHtml, prettyTime, anim, reduceCount } from '../util.js'
 import { externalLink } from '../view-util.js'
 
 import { getComments } from '../api.js'
@@ -21,7 +21,7 @@ const postCommentRefresh = z`
   user-select none
 `
 
-const fixComment = z`
+const commentContents = z`
   word-break break-word
   blockquote {
     pl 8
@@ -30,6 +30,7 @@ const fixComment = z`
   }
   blockquote:last-child { mb 0 }
   p { margin 0.75em 0 }
+  pre { white-space pre-wrap }
 `
 
 const PostComment = ({ attrs: { comment } }) => {
@@ -111,7 +112,7 @@ const PostComment = ({ attrs: { comment } }) => {
               ? m('em' + z`c $score-hidden-color`, 'Score Hidden')
               : m(
                   'span.score' + z`fw bold;c $${cmt.score >= 1 ? 'good' : 'bad'}-score-color`,
-                  cmt.score
+                  reduceCount(cmt.score)
                 ),
             sep(),
             m(
@@ -137,7 +138,7 @@ const PostComment = ({ attrs: { comment } }) => {
           ]),
           m('div', { hidden: cmt.collapsed }, [
             m(
-              'div.post-comment-text' + fixComment,
+              'div.post-comment-text' + commentContents,
               {
                 onmousedown: e => {
                   if (
