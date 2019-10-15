@@ -35,7 +35,17 @@ const PostInfo = {
             { href: '/r/' + post.subreddit, oncreate: m.route.link },
             post.subreddit
           )
-        ])
+        ]),
+        post.author && post.type !== 'Self' && [
+          ' by ',
+          m('span', [
+            m(
+              'a' + z`font-style italic`,
+              { href: API_URL + '/u/' + post.author},
+              'u/' + post.author
+            )
+          ])
+        ]
       ])
     ])
 }
