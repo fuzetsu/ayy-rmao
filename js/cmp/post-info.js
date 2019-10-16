@@ -36,6 +36,14 @@ const PostInfo = {
             post.subreddit
           )
         ]),
+        post.author && post.type !== 'Self' && [
+          ' by ',
+          m(
+            externalLink + z`font-style italic; font-weight bold;`,
+            { href: API_URL + '/u/' + post.author, title: 'u/' + post.author},
+            'u/' + post.author
+          )
+        ],
         ' ',
         prettyTime(post.created_utc * 1000)
       ])

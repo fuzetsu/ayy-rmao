@@ -81,7 +81,7 @@ export const getPosts = (subreddit, after, nsfw) =>
     )
 
 // the base list of attributes to copy
-const baseAttrs = ['name', 'permalink', 'subreddit', 'score', 'num_comments', 'title', 'created_utc']
+const baseAttrs = ['name', 'permalink', 'subreddit', 'score', 'num_comments', 'title', 'author', 'created_utc']
 
 // array of post types, how to match, and how to display them
 const postTypes = [
@@ -146,14 +146,14 @@ const postTypes = [
     match: function(post) {
       return post.is_self
     },
-    fields: ['author', 'selftext_html']
+    fields: ['selftext_html']
   },
   {
     type: 'Link',
     match: function() {
       return true
     },
-    fields: ['author', 'thumbnail']
+    fields: ['thumbnail']
   }
 ]
 
