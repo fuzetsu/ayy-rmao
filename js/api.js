@@ -55,15 +55,14 @@ export const getPosts = (subreddit, after, nsfw) =>
     )
 
 // the base list of attributes to copy
-const baseAttrs = ['name', 'permalink', 'subreddit', 'score', 'num_comments', 'title']
+const baseAttrs = ['name', 'permalink', 'subreddit', 'score', 'num_comments', 'title', 'author']
 
 // array of post types, how to match, and how to display them
 const postTypes = [
-  { type: 'Video', match: /\.(webm|mp4)$/i, fields: ['author'] },
+  { type: 'Video', match: /\.(webm|mp4)$/i },
   {
     type: 'Video',
     match: /imgur.+\.(gif|gifv)$/i,
-    fields: ['author'],
     parse: function(url) {
       return url.replace(/\.[^.]+$/, '.mp4')
     }
@@ -72,7 +71,6 @@ const postTypes = [
     type: 'Video',
     postParse: true,
     match: post => post.post_hint === 'hosted:video',
-    fields: ['author'],
     parse: (post, res) => {
       const url = post.media.reddit_video.fallback_url
       res.sound = url
@@ -87,7 +85,6 @@ const postTypes = [
     type: 'Image',
     match: /reddituploads/i,
     strip: false,
-    fields: ['author'],
     parse: function(url) {
       return url.replace(/&amp;/gi, '&')
     }
@@ -96,7 +93,6 @@ const postTypes = [
   {
     type: 'Image',
     match: /imgur\.com\/[a-z0-9]+$/i,
-    fields: ['author'],
     parse: function(url) {
       return `http://i.imgur.com/${url.match(/([^/]+)$/)[0]}.gif`
     }
@@ -105,7 +101,6 @@ const postTypes = [
     type: 'Embed',
     desc: 'Imgur Gallery',
     match: /imgur\.com\/(a|gallery)\/[a-z0-9]+$/i,
-    fields: ['author'],
     parse: function(url) {
       return (
         url.replace(/\/gallery\//, '/a/').replace(/^http:/, 'https:') +
@@ -118,7 +113,6 @@ const postTypes = [
     match: /gfycat\.com\/[a-z0-9]+$/i,
     strip: true,
     postParse: true,
-    fields: ['author'],
     parse: post => post.preview.reddit_video_preview.fallback_url
   },
   {
@@ -126,14 +120,14 @@ const postTypes = [
     match: function(post) {
       return post.is_self
     },
-    fields: ['author', 'selftext_html']
+    fields: ['selftext_html']
   },
   {
     type: 'Link',
     match: function() {
       return true
     },
-    fields: ['author', 'thumbnail']
+    fields: ['thumbnail']
   }
 ]
 
