@@ -1,5 +1,5 @@
 import { m, z } from '../ext-deps.js'
-import { pluralize, reduceCount, relativeTime } from '../util.js'
+import { pluralize, reduceCount, prettyTime } from '../util.js'
 import { externalLink } from '../view-util.js'
 import { API_URL } from '../constants.js'
 import { setOpen } from '../actions.js'
@@ -37,8 +37,7 @@ const PostInfo = {
           )
         ]),
         ' ',
-        relativeTime(post.created),
-        ' ago'
+        prettyTime(post.created_utc * 1000)
       ])
     ])
 }

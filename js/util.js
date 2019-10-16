@@ -112,25 +112,3 @@ export const reduceCount = (count, digits = 1) => {
   // Do not reduce if we are below 1000
   return divisor ? (count / divisor).toFixed(digits) + indicator : count
 }
-
-export const relativeTime = time => {
-  let relativeTime = (new Date().getTime() / 1000) - time
-  let output = ''
-  let timeInterval = '';
-
-  if (relativeTime < 60) {
-    output = relativeTime
-    timeInterval = 'second'
-  } else if (relativeTime < 3600) {
-    output = relativeTime / 60
-    timeInterval = 'minute'
-  } else if (relativeTime < 86400) {
-    output = relativeTime / 3600
-    timeInterval = 'hour'
-  } else {
-    output = relativeTime / 86400
-    timeInterval = 'day'
-  }
-
-  return Math.round(output) + ' ' + timeInterval + (output > 1 ? 's' : '')
-}

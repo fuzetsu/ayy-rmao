@@ -81,7 +81,7 @@ export const getPosts = (subreddit, after, nsfw) =>
     )
 
 // the base list of attributes to copy
-const baseAttrs = ['name', 'permalink', 'subreddit', 'score', 'num_comments', 'title', 'created']
+const baseAttrs = ['name', 'permalink', 'subreddit', 'score', 'num_comments', 'title', 'created_utc']
 
 // array of post types, how to match, and how to display them
 const postTypes = [
