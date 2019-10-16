@@ -1,5 +1,5 @@
 import { m, z } from '../ext-deps.js'
-import { pluralize, reduceCount } from '../util.js'
+import { pluralize, reduceCount, relativeTime } from '../util.js'
 import { externalLink } from '../view-util.js'
 import { API_URL } from '../constants.js'
 import { setOpen } from '../actions.js'
@@ -35,7 +35,10 @@ const PostInfo = {
             { href: '/r/' + post.subreddit, oncreate: m.route.link },
             post.subreddit
           )
-        ])
+        ]),
+        ' ',
+        relativeTime(post.created),
+        ' ago'
       ])
     ])
 }
