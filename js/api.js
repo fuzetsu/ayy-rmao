@@ -29,14 +29,15 @@ export const searchPosts = async (query, sort = true) => {
   return results
 }
 
-export const getComments = (post, comment) =>
+export const getComments = (post, comment, sort = 'new') =>
   m
     .request({
       method: 'get',
       background: true,
       url: `${API_URL}/${post.permalink}.json`,
       data: {
-        comment: comment && comment.id
+        comment: comment && comment.id,
+        sort
       }
     })
     .then(data => data[1].data.children)
