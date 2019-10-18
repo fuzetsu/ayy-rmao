@@ -45,7 +45,7 @@ const PostInfo = {
           )
         ],
         ' ',
-        prettyTime(post.created_utc * 1000)
+        prettyTime(post.created_utc * 1000) || new Date(post.created_utc * 1000).toLocaleString()
       ])
     ])
 }
