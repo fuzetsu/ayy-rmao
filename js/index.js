@@ -1,5 +1,4 @@
-import setup from 'https://unpkg.com/meiosis-setup@2/mergerino'
-import { m, merge, stream } from './ext-deps.js'
+import { m, merge, stream, setupMeiosis } from './ext-deps.js'
 import { id, safeParse } from './util.js'
 
 import { BORDERS } from './constants.js'
@@ -36,7 +35,7 @@ const app = {
 export let state
 export let update
 
-setup({ merge, stream, app }).then(({ update: up, states }) => {
+setupMeiosis({ merge, stream, app }).then(({ update: up, states }) => {
   update = up
   states.map(x => (state = x)).map(m.redraw)
 
