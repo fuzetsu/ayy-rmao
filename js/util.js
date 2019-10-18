@@ -113,7 +113,7 @@ export const reduceCount = (count, digits = 1) => {
   return divisor ? (count / divisor).toFixed(digits) + indicator : count
 }
 
-export const SortingMap = [
+export const SortingOptions = [
   { value: 'new', text: 'New' },
   { value: 'top', text: 'Top' },
   { value: 'old', text: 'Old' },

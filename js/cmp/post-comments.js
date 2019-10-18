@@ -10,7 +10,7 @@ import LoadMoreComments from './load-more-comments.js'
 import PostPreview from './post-preview.js'
 import { state } from '../index.js'
 import { setOpen } from '../actions.js'
-import { SortingMap } from '../util.js'
+import { SortingOptions } from '../util.js'
 
 const PostComments = ({ attrs: { post } }) => {
   let comments = []
@@ -38,7 +38,7 @@ const PostComments = ({ attrs: { post } }) => {
                 {
                   onchange: e => loadComments(e.target.value)
                 },
-                SortingMap.map(sortOption => m('option', sortOption))
+                SortingOptions.map(sortOption => m('option', sortOption))
               )
             ]),
             m(
