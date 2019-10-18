@@ -1,0 +1,43 @@
+{
+  "name": "ayy-rmao",
+  "version": "1.0.0",
+  "description": "simple media focused reddit client",
+  "main": "js/index.js",
+  "scripts": {
+    "build": "node build.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/fuzetsu/ayy-rmao.git"
+  },
+  "author": "Daniel Loomer",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/fuzetsu/ayy-rmao/issues"
+  },
+  "mdeps": {
+    "./js/ext-deps.js": {
+      "mithril@2.0.0-rc.4": {
+        "name": "m",
+        "exports": []
+      },
+      "mergerino@0.4": {
+        "name": "merge",
+        "exports": []
+      },
+      "zaftig@0.7": {
+        "name": "z",
+        "exports": []
+      },
+      "meiosis-setup@2/mergerino": {
+        "exports": [],
+        "name": "setupMeiosis"
+      },
+      "meiosis-setup@2/simple-stream": {
+        "name": "stream",
+        "exports": []
+      }
+    }
+  },
+  "homepage": "https://github.com/fuzetsu/ayy-rmao#readme"
+}

@@ -1,4 +1,3 @@
-// import { SUB } from './ext-deps.js'
 import { setNight } from './styles.js'
 import { BORDERS, FIRST_LOAD_NUM } from './constants.js'
 import { update, state } from './index.js'
