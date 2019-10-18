@@ -1,5 +1,5 @@
 import { m, z } from '../ext-deps.js'
-import { pluralize, reduceCount } from '../util.js'
+import { pluralize, reduceCount, prettyTime } from '../util.js'
 import { externalLink } from '../view-util.js'
 import { API_URL } from '../constants.js'
 import { setOpen } from '../actions.js'
@@ -43,7 +43,9 @@ const PostInfo = {
             { href: API_URL + '/u/' + post.author, title: 'u/' + post.author},
             'u/' + post.author
           )
-        ]
+        ],
+        ' ',
+        prettyTime(post.created_utc * 1000) || new Date(post.created_utc * 1000).toLocaleString()
       ])
     ])
 }
