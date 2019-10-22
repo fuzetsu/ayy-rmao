@@ -18,7 +18,7 @@ const PostComments = ({ attrs: { post } }) => {
 
   // load comments
   const loadComments = sort => {
-      getComments(post, null, sort).then(data => {
+    getComments(post, null, sort).then(data => {
       comments = data
       loading = false
       m.redraw()
