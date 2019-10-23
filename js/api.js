@@ -29,7 +29,7 @@ export const searchPosts = async (query, sort = true) => {
   return results
 }
 
-export const getComments = (post, comment, sort = 'new') =>
+export const getComments = (post, comment, sort = 'confidence') =>
   m
     .request({
       method: 'get',

@@ -112,14 +112,3 @@ export const reduceCount = (count, digits = 1) => {
   // Do not reduce if we are below 1000
   return divisor ? (count / divisor).toFixed(digits) + indicator : count
 }
-
-export const SortingOptions = [
-  { value: 'new', text: 'New' },
-  { value: 'top', text: 'Top' },
-  { value: 'old', text: 'Old' },
-  { value: 'controversial', text: 'Controversial' },
-  { value: 'random', text: 'Random' },
-  { value: 'qa', text: 'QA' },
-  { value: 'live', text: 'Live' },
-  { value: 'confidence', text: 'Confidence' }
-]

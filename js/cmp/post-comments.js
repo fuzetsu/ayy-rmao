@@ -10,14 +10,18 @@ import LoadMoreComments from './load-more-comments.js'
 import PostPreview from './post-preview.js'
 import { state } from '../index.js'
 import { setOpen } from '../actions.js'
-import { SortingOptions } from '../util.js'
+import { SortingOptions } from '../constants.js'
 
 const PostComments = ({ attrs: { post } }) => {
   let comments = []
   let loading = true
+  let currentSort = 'confidence'
 
   // load comments
   const loadComments = sort => {
+    loading = true
+    currentSort = sort
+
     getComments(post, null, sort).then(data => {
       comments = data
       loading = false
@@ -25,7 +29,7 @@ const PostComments = ({ attrs: { post } }) => {
     })
   }
 
-  loadComments('new')
+  loadComments('confidence')
 
   return {
     view: () =>
@@ -36,7 +40,8 @@ const PostComments = ({ attrs: { post } }) => {
               'Sort by ',
               m('select',
                 {
-                  onchange: e => loadComments(e.target.value)
+                  onchange: e => loadComments(e.target.value),
+                  value: currentSort
                 },
                 SortingOptions.map(sortOption => m('option', sortOption))
               )
