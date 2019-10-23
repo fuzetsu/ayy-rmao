@@ -30,3 +30,14 @@ export const BORDERS = {
 }
 
 export const LOADING_IMG = './img/loading.gif'
+
+export const SortingOptions = [
+  { value: 'confidence', text: 'Best' },
+  { value: 'top', text: 'Top' },
+  { value: 'new', text: 'New' },
+  { value: 'controversial', text: 'Controversial' },
+  { value: 'old', text: 'Old' },
+  { value: 'qa', text: 'QA' },
+  { value: 'random', text: 'Random' }
+  // { value: 'live', text: 'Live' }
+]
