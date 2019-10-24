@@ -9,18 +9,19 @@ import PostComment from './post-comment.js'
 import LoadMoreComments from './load-more-comments.js'
 import PostPreview from './post-preview.js'
 import { state } from '../index.js'
-import { setOpen } from '../actions.js'
+import { setOpen, setCommentSort } from '../actions.js'
 import { SortingOptions } from '../constants.js'
 
 const PostComments = ({ attrs: { post } }) => {
   let comments = []
-  let loading = true
-  let currentSort = 'confidence'
+  let loading
 
   // load comments
   const loadComments = sort => {
     loading = true
-    currentSort = sort
+
+    if (sort) setCommentSort(sort)
+    else sort = state.commentSort
 
     getComments(post, null, sort).then(data => {
       comments = data
@@ -29,19 +30,20 @@ const PostComments = ({ attrs: { post } }) => {
     })
   }
 
-  loadComments('confidence')
+  loadComments()
 
   return {
     view: () =>
       loading
         ? m('div' + z`ta center`, loadingImg())
         : m('div.post-comments' + z`ta left`, [
-            m('div' + z`ta right`, [
+            m('div' + z`ta right;position relative;top 40;mt -45`, [
               'Sort by ',
-              m('select',
+              m(
+                'select',
                 {
                   onchange: e => loadComments(e.target.value),
-                  value: currentSort
+                  value: state.commentSort
                 },
                 SortingOptions.map(sortOption => m('option', sortOption))
               )

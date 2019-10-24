@@ -11,6 +11,7 @@ const app = {
   Initial: () => ({
     nsfw: false,
     filter: '',
+    commentSort: 'confidence',
     nightMode: false,
     ...safeParse(localStorage.ayyRmaov1),
     openPost: null,
