@@ -73,7 +73,7 @@ const PostComment = ({ attrs: { comment } }) => {
       : cmt.distinguished === 'admin'
       ? 'admin'
       : ''
-    return type && `content '[${type.toUpperCase()}]'; c var(--${type}-color)`
+    return type && `content '[${type.toUpperCase()}]'; c $${type}-color`
   }
   return {
     view: ({ attrs: { comment: cmt } }) => {

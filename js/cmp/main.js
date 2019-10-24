@@ -71,7 +71,7 @@ const Main = () => {
           ),
           m(
             'div' + z`mt ${posts.length ? '10' : '15%'};transition margin-top 1s ease`,
-            m('h1.page-title' + z`fs var(--title-text)`, 'Ayy Rmao'),
+            m('h1.page-title' + z`fs $title-text`, 'Ayy Rmao'),
             m(
               'div' +
                 z`
@@ -79,7 +79,7 @@ const Main = () => {
                 > input[type=text] {
                   ta center
                   p 5;br 4;border none
-                  fs var(--large-text)
+                  fs $large-text
                 }
               `,
               m('input[type=text][placeholder=subreddit]', {
@@ -102,7 +102,7 @@ const Main = () => {
               ])
             ),
             m(
-              'p' + z`fs var(--small-text);mb 40px`,
+              'p' + z`fs $small-text;mb 40px`,
               failed
                 ? 'Failed to load subreddit. Please check name and try again.'
                 : !subreddit

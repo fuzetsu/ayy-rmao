@@ -23,7 +23,10 @@ const PostInfo = {
         )
       ]),
       m('.post-info' + z`mb 5; > span { fw bold }`, [
-        m('span' + z`c var(--${post.score > 0 ? 'good-score' : 'bad-score'}-color)`, reduceCount(post.score)),
+        m(
+          'span' + z`c $${post.score > 0 ? 'good-score' : 'bad-score'}-color`,
+          reduceCount(post.score)
+        ),
         ' ',
         pluralize('point', post.score),
         ' and ',
@@ -36,14 +39,15 @@ const PostInfo = {
             post.subreddit
           )
         ]),
-        post.author && post.type !== 'Self' && [
-          ' by ',
-          m(
-            externalLink + z`font-style italic; font-weight bold;`,
-            { href: API_URL + '/u/' + post.author, title: 'u/' + post.author},
-            'u/' + post.author
-          )
-        ],
+        post.author &&
+          post.type !== 'Self' && [
+            ' by ',
+            m(
+              externalLink + z`font-style italic; font-weight bold;`,
+              { href: API_URL + '/u/' + post.author, title: 'u/' + post.author },
+              'u/' + post.author
+            )
+          ],
         ' ',
         prettyTime(post.created_utc * 1000) || new Date(post.created_utc * 1000).toLocaleString()
       ])

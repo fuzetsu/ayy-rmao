@@ -45,6 +45,7 @@ z.global`
     c $text-color
     bc $bg-color
     ff "Segoe UI",Roboto,Oxygen,Ubuntu,"Droid Sans",sans-serif
+    fs 16
   }
   * { box-sizing border-box }
   a {

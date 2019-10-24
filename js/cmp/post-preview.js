@@ -82,7 +82,7 @@ const SelfPost = {
         w 750
         max-width 80%
         ta left
-        bc var(--bg-color-lighter)
+        bc $bg-color-lighter
         br 5
         word-wrap break-word
         m auto

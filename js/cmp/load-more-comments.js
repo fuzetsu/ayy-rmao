@@ -1,5 +1,5 @@
 import { m, z } from '../ext-deps.js'
-import { COMMENT_LOAD_NUM, API_URL } from '../constants.js'
+import { COMMENT_LOAD_NUM } from '../constants.js'
 import { state } from '../index.js'
 import { pluralize } from '../util.js'
 import { loadingImg } from '../view-util.js'

@@ -27,7 +27,7 @@ const Modal = {
           w 90%
           max-width 1200
           max-height 90vh
-          bc var(--bg-color)
+          bc $bg-color
           br 10
           d flex
           fd column
