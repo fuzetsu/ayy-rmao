@@ -25,7 +25,7 @@
         "name": "merge",
         "exports": []
       },
-      "zaftig@0.7": {
+      "zaftig@0.8": {
         "name": "z",
         "exports": []
       },
