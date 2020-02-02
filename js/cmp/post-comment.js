@@ -1,5 +1,5 @@
 import { m, z } from '../ext-deps.js'
-import { processRedditHtml, prettyTime, anim, reduceCount } from '../util.js'
+import { processRedditHtml, prettyTime, reduceCount } from '../util.js'
 import { externalLink } from '../view-util.js'
 
 import { getComments } from '../api.js'
@@ -7,19 +7,6 @@ import { API_URL } from '../constants.js'
 import { state } from '../index.js'
 
 import LoadMoreComments from './load-more-comments.js'
-
-const postCommentRefresh = z`
-  background $text-color
-  color $bg-color
-  br 15
-  width 25
-  fs small
-  display inline-block
-  text-align center
-  box-sizing border-box
-  cursor pointer
-  user-select none
-`
 
 const commentContents = z`
   word-break break-word
@@ -35,7 +22,6 @@ const commentContents = z`
 
 const PostComment = ({ attrs: { comment } }) => {
   let isRefreshing = false
-  let refreshIndDom
   // cache comment html for performance
   const commentHtml = m.trust(processRedditHtml(comment.body_html))
   const setDepth = (comment, depth) => {
@@ -47,21 +33,12 @@ const PostComment = ({ attrs: { comment } }) => {
   const refreshComment = cmt => {
     isRefreshing = true
     getComments(state.openPost, cmt).then(([newCmt]) => {
-      if (refreshIndDom) {
-        // reset refreshing after animation ends
-        anim(
-          refreshIndDom,
-          () => {
-            isRefreshing = false
-            m.redraw()
-          },
-          'iteration'
-        )
+      isRefreshing = false
+      if (newCmt && newCmt.data) {
+        // normalize comment depth (will always start from 0 so set based on current depth)
+        setDepth(newCmt.data, cmt.depth)
+        Object.assign(cmt, newCmt.data)
       }
-      if (!newCmt || !newCmt.data) return
-      // normalize comment depth (will always start from 0 so set based on current depth)
-      setDepth(newCmt.data, cmt.depth)
-      Object.assign(cmt, newCmt.data)
       m.redraw()
     })
   }
@@ -124,16 +101,11 @@ const PostComment = ({ attrs: { comment } }) => {
             m(externalLink, { href: API_URL + cmt.permalink }, 'permalink'),
             sep(),
             m(
-              'span.post-comment-refresh[title=Refresh Comment Thread]' + postCommentRefresh,
-              { onclick: () => refreshComment(cmt) },
-              m(
-                'span' + z`d inline-block;ta center`,
-                {
-                  oncreate: ({ dom }) => (refreshIndDom = dom),
-                  class: isRefreshing ? z`spinAnimation` : ''
-                },
-                '⟳'
-              )
+              'a.refresh-comment' +
+                z`cursor pointer` +
+                z(isRefreshing && 'color $score-hidden-color'),
+              { onclick: () => !isRefreshing && refreshComment(cmt) },
+              'refresh'
             )
           ]),
           m('div', { hidden: cmt.collapsed }, [
