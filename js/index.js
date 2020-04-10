@@ -22,14 +22,15 @@ const app = {
     posts: []
   }),
   services: [
-    ({ state }) =>
-      (localStorage.ayyRmaov1 = JSON.stringify(
+    ({ state }) => {
+      localStorage.ayyRmaov1 = JSON.stringify(
         merge(state, {
           openPost: undefined,
           posts: undefined,
           subreddit: undefined
         })
-      ))
+      )
+    }
   ]
 }
 

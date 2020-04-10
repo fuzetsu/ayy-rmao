@@ -1,5 +1,5 @@
 import { setNight } from './styles.js'
-import { BORDERS, FIRST_LOAD_NUM } from './constants.js'
+import { BORDERS, FIRST_LOAD_NUM, LOAD_NUM } from './constants.js'
 import { update, state } from './index.js'
 import { getPosts } from './api.js'
 
@@ -35,6 +35,7 @@ export const loadPosts = (sub, append = false) => {
 }
 
 export const resetPosts = () => update({ posts: [], limit: FIRST_LOAD_NUM })
+export const increaseLimit = () => update({ limit: x => x + LOAD_NUM })
 
 export const toggleNsfw = () => update({ nsfw: x => !x })
 export const setSub = x => update({ subreddit: x })

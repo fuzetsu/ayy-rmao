@@ -1,26 +1,26 @@
-import { LOAD_NUM, ADD_MORE_THRESHOLD, UNICODE } from '../constants.js'
+import { UNICODE, ADD_MORE_THRESHOLD } from '../constants.js'
 import { m, z } from '../ext-deps.js'
-import { throttle } from '../util.js'
+import { throttle, withNoRedraw } from '../util.js'
 import { PostCommentsModal } from './post-comments.js'
 import PostList from './post-list.js'
 import Search from './search.js'
 import { loadingImg } from '../view-util.js'
 
 import { state } from '../index.js'
-import { setNightTheme, loadPosts, resetPosts } from '../actions.js'
+import { setNightTheme, loadPosts, resetPosts, increaseLimit } from '../actions.js'
 
 const Main = () => {
   let atPageTop = true
-  const handleScroll = throttle(250, e => {
-    const scrollTop = e.target.scrollTop
-    const wasAtPageTop = atPageTop
-    atPageTop = scrollTop < 50
-    if (e.target.scrollHeight - (window.innerHeight + scrollTop) < window.innerHeight) {
-      state.limit += LOAD_NUM
-    } else {
-      if (wasAtPageTop === atPageTop) e.redraw = false
-    }
-  })
+  const handleScroll = withNoRedraw(
+    throttle(250, e => {
+      const scrollTop = e.target.scrollTop
+      const wasAtPageTop = atPageTop
+      atPageTop = scrollTop < 50
+      if (e.target.scrollHeight - (window.innerHeight + scrollTop) < window.innerHeight)
+        increaseLimit()
+      else if (wasAtPageTop !== atPageTop) m.redraw()
+    })
+  )
 
   // read hash and load posts if appropriate
   const sub = m.route.param('key')

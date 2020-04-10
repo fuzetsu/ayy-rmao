@@ -5,7 +5,7 @@ export const p = (...args) => (console.log(...args), args[0])
 export const titleCase = str =>
   str.replace(/([a-z]+)/gi, match => match.charAt(0).toUpperCase() + match.slice(1))
 
-export const htmlDecode = function(input) {
+export const htmlDecode = input => {
   const e = document.createElement('div')
   e.innerHTML = input
   return e.childNodes.length === 0 ? '' : e.childNodes[0].nodeValue
@@ -13,16 +13,24 @@ export const htmlDecode = function(input) {
 
 export const processRedditHtml = html => htmlDecode(html).replace(/<a/gi, '<a target="_blank"')
 
-export const throttle = (limit, callback, wait = false) => (...args) => {
-  if (wait) return
-  callback(...args)
-  wait = true
-  setTimeout(function() {
-    wait = false
-  }, limit)
+export const throttle = (ms, fn, id = {}) => {
+  let lastCall
+  const throttled = (...args) => {
+    clearTimeout(id.current)
+    const delta = Date.now() - lastCall
+    // trailing call
+    if (delta < ms) {
+      id.current = setTimeout(throttled, ms - delta, ...args)
+      return
+    }
+    lastCall = Date.now()
+    fn(...args)
+  }
+  return throttled
 }
 
 export const withAttrNoRedraw = (attr, func) => e => ((e.redraw = false), func(e.target[attr]))
+export const withNoRedraw = fn => e => ((e.redraw = false), fn(e))
 
 export const storeSet = (key, val) => (localStorage[key] = JSON.stringify(val))
 

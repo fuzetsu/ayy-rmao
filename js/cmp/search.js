@@ -34,9 +34,9 @@ export default function Search() {
           onkeydown: handleEnter,
           value: filter
         }),
-        m('label', { onclick: () => (toggleNsfw(), loadPosts(subreddit)) }, [
+        m('label', [
           m('span' + z`va bottom`, 'NSFW '),
-          m(Toggle, { value: nsfw })
+          m(Toggle, { value: nsfw, ontoggle: () => (toggleNsfw(), loadPosts(subreddit)) })
         ])
       )
     }
