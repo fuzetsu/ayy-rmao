@@ -62,7 +62,10 @@ pl.Embed = () => {
       }
       return m('.embed-post', [
         loaded
-          ? m('iframe[frameborder=0]' + z`h 90vh;w 90%`, { src })
+          ? [
+              m('a', { onclick: () => (loaded = false) }, 'close'),
+              m('iframe[frameborder=0]' + z`h 90vh;w 90%`, { src })
+            ]
           : m(
               'button.load-embed' + z`p 10 15;m 7 0`,
               { onclick: () => (loaded = true) },
