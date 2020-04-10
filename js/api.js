@@ -99,9 +99,7 @@ const postTypes = [
   {
     type: 'Video',
     match: /imgur.+\.(gif|gifv)$/i,
-    parse: function(url) {
-      return url.replace(/\.[^.]+$/, '.mp4')
-    }
+    parse: url => url.replace(/\.[^.]+$/, '.mp4')
   },
   {
     type: 'Video',
@@ -109,11 +107,7 @@ const postTypes = [
     match: post => post.post_hint === 'hosted:video',
     parse: (post, res) => {
       const url = post.media.reddit_video.fallback_url
-      res.sound = url
-        .split('/')
-        .slice(0, -1)
-        .concat('audio')
-        .join('/')
+      res.sound = url.split('/').slice(0, -1).concat('audio').join('/')
       return url
     }
   },
@@ -121,28 +115,21 @@ const postTypes = [
     type: 'Image',
     match: /reddituploads/i,
     strip: false,
-    parse: function(url) {
-      return url.replace(/&amp;/gi, '&')
-    }
+    parse: url => url.replace(/&amp;/gi, '&')
   },
   { type: 'Image', match: /\.(jpg|png|gif)$/i },
   {
     type: 'Image',
     match: /imgur\.com\/[a-z0-9]+$/i,
-    parse: function(url) {
-      return `http://i.imgur.com/${url.match(/([^/]+)$/)[0]}.gif`
-    }
+    parse: url => `http://i.imgur.com/${url.match(/([^/]+)$/)[0]}.gif`
   },
   {
     type: 'Embed',
     desc: 'Imgur Gallery',
     match: /imgur\.com\/(a|gallery)\/[a-z0-9]+$/i,
-    parse: function(url) {
-      return (
-        url.replace(/\/gallery\//, '/a/').replace(/^http:/, 'https:') +
-        '/embed?pub=true&analytics=false'
-      )
-    }
+    parse: url =>
+      url.replace(/\/gallery\//, '/a/').replace(/^http:/, 'https:') +
+      '/embed?pub=true&analytics=false'
   },
   {
     type: 'Video',
@@ -153,35 +140,31 @@ const postTypes = [
   },
   {
     type: 'Self',
-    match: function(post) {
-      return post.is_self
-    },
+    match: post => post.is_self,
     fields: ['selftext_html']
   },
   {
     type: 'Link',
-    match: function() {
-      return true
-    },
+    match: () => true,
     fields: ['thumbnail']
   }
 ]
 
 // iterates through post types looking for a match for the given url
-const detectPostType = function(post) {
+const detectPostType = function (post) {
   const url = post.url.replace(/[?#].*$/, '')
-  const npost = {}
+  const cleanPost = {}
   postTypes.some(type => {
     if (typeof type.match === 'function' ? type.match(post) : type.match.test(url)) {
-      baseAttrs.concat(type.fields || []).forEach(field => (npost[field] = post[field]))
-      ;['type', 'parseAsync', 'desc'].forEach(field => (npost[field] = type[field]))
-      npost.url = type.parse
-        ? type.parse(type.postParse ? post : type.strip === false ? post.url : url, npost)
+      baseAttrs.concat(type.fields || []).forEach(field => (cleanPost[field] = post[field]))
+      ;['type', 'parseAsync', 'desc'].forEach(field => (cleanPost[field] = type[field]))
+      cleanPost.url = type.parse
+        ? type.parse(type.postParse ? post : type.strip === false ? post.url : url, cleanPost)
         : type.strip
         ? url
         : post.url
       return true
     }
   })
-  return npost
+  return cleanPost
 }
