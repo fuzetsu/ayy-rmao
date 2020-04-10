@@ -15,6 +15,9 @@ const dayMode = `
   $bg-color-lighter #fff
   $scroll-track-color #e0e0e0
   $scroll-thumb-color #aaa
+  $toggle-on #2f855a
+  $toggle-off #cbd5e0
+  $toggle-slider #f7fafc
 `
 
 const nightMode = `
@@ -32,6 +35,9 @@ const nightMode = `
   $bg-color-lighter #444
   $scroll-track-color #444
   $scroll-thumb-color #555
+  $toggle-on #68d391
+  $toggle-off #4a5568
+  $toggle-slider #f7fafc
 `
 
 export const setNight = on => z.global`html, body { ${on ? nightMode : dayMode} }`
