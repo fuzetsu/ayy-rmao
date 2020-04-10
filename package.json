@@ -39,5 +39,10 @@
       }
     }
   },
-  "homepage": "https://github.com/fuzetsu/ayy-rmao#readme"
+  "homepage": "https://github.com/fuzetsu/ayy-rmao#readme",
+  "devDependencies": {
+    "cypress": "^4.3.0",
+    "eslint-config-prettier": "^6.10.1",
+    "eslint-plugin-cypress": "^2.10.3"
+  }
 }

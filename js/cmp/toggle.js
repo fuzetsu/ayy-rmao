@@ -6,7 +6,7 @@ export default function Toggle() {
   return {
     view: ({ attrs: { value, style = '', ontoggle } }) =>
       m(
-        'div' +
+        'div.toggle-button' +
           z`
           $name toggle
           d inline-block

@@ -3,7 +3,7 @@ module.exports = {
     browser: true,
     es6: true
   },
-  extends: ['eslint:recommended'],
+  extends: ['eslint:recommended', 'plugin:cypress/recommended', 'prettier'],
   globals: {},
   parserOptions: {
     ecmaVersion: 2018,

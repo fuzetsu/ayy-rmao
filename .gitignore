@@ -1,3 +1,6 @@
 # Windows Stuff
 Thumbs.db
 .c9
+
+# nodejs
+node_modules
