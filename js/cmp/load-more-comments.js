@@ -11,7 +11,7 @@ const LoadMoreComments = () => {
     view({ attrs: { parentArray, moreComments: mc } }) {
       if (loading) return m('div' + z`ta center`, loadingImg())
       const count = mc.children && mc.children.length
-      // dont show button if no comments to load...
+      // don't show button if no comments to load...
       if (count <= 0) return ''
       return m(
         'a.load-more-comments[href=#]' + z`d inline-block;mt 5`,
