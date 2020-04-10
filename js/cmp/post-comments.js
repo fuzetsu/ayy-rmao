@@ -36,8 +36,8 @@ const PostComments = ({ attrs: { post } }) => {
     view: () =>
       loading
         ? m('div' + z`ta center`, loadingImg())
-        : m('div.post-comments' + z`ta left`, [
-            m('div' + z`ta right;position relative;top 15;mt -30`, [
+        : m('div.post-comments' + z`ta left;position relative`, [
+            m('span' + z`position absolute;t 0;r 0`, [
               'Sort by ',
               m(
                 'select',
