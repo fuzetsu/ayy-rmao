@@ -29,4 +29,25 @@ describe('Ayy Rmao', () => {
       cy.get('.post-preview').should('have.length.gt', firstLength)
     })
   })
+
+  it('can resize image with click', () => {
+    loadSub('pics')
+    cy.get('.image-post img:first')
+      .should('have.css', 'cursor', 'row-resize')
+      .then($img => {
+        const width = $img.width()
+        $img.click()
+        expect($img.width()).to.be.gt(width)
+      })
+  })
+
+  it('can resize video with click', () => {
+    loadSub('gifs')
+    cy.get('.video-post video:first')
+      .should('have.css', 'cursor', 'row-resize')
+      .then($vid => {
+        const width = $vid.width()
+        cy.wrap($vid).click().invoke('width').should('be.gt', width)
+      })
+  })
 })
