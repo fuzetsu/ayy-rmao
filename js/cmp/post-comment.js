@@ -90,11 +90,8 @@ const PostComment = ({ attrs: { comment } }) => {
                   reduceCount(cmt.score)
                 ),
             sep(),
-            m(
-              'span' + z`c $score-hidden-color)`,
-              prettyTime(createdAt) || createdAt.toLocaleString(),
-              editedAt ? [sep(), ' edited ', prettyTime(editedAt) || editedAt.toLocaleString()] : ''
-            ),
+            prettyTime(createdAt) || createdAt.toLocaleString(),
+            editedAt ? [sep(), ' edited ', prettyTime(editedAt) || editedAt.toLocaleString()] : '',
             sep(),
             m(externalLink, { href: API_URL + cmt.permalink }, 'permalink'),
             sep(),
