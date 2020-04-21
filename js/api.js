@@ -34,7 +34,7 @@ export const getComments = (post, comment, sort = 'confidence') =>
     .request({
       method: 'get',
       background: true,
-      url: `${API_URL}/${post.permalink}.json`,
+      url: API_URL + post.permalink + '.json',
       data: {
         comment: comment && comment.id,
         sort
