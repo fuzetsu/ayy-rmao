@@ -42,16 +42,14 @@ const PostComment = ({ attrs: { comment } }) => {
       m.redraw()
     })
   }
-  const getAuthorStyle = cmt => {
-    const type = cmt.is_submitter
-      ? 'op'
+  const getAuthorStyle = cmt =>
+    cmt.is_submitter
+      ? `content '[OP]'; c $op-color`
       : cmt.distinguished === 'moderator'
-      ? 'mod'
+      ? `content '[MOD]'; c $mod-color`
       : cmt.distinguished === 'admin'
-      ? 'admin'
+      ? `content '[ADMIN]'; c $admin-color`
       : ''
-    return type && `content '[${type.toUpperCase()}]'; c $${type}-color`
-  }
   return {
     view: ({ attrs: { comment: cmt } }) => {
       const createdAt = new Date(cmt.created_utc * 1000)
