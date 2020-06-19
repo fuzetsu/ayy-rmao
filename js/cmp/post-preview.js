@@ -9,11 +9,27 @@ const pl = {}
 pl.Video = ({ attrs: { post } }) => {
   let audio = null
   let ready = true
+  let id
 
-  const syncAudio = (vid, pause = false) =>
-    audio && ready && ((audio.currentTime = vid.currentTime), audio[pause ? 'pause' : 'play']())
-  const play = ({ target: vid }) => (vid.play(), syncAudio(vid))
-  const pause = ({ target: vid }) => (vid.pause(), syncAudio(vid, true))
+  const play = ({ target: vid }) => {
+    vid.play()
+    if (audio) {
+      id = setInterval(() => {
+        if (!ready || Math.abs(audio.currentTime - vid.currentTime) < 0.2) return
+        audio.currentTime = vid.currentTime
+        vid.currentTime = audio.currentTime
+        vid.play()
+        audio.play()
+      }, 1000)
+    }
+  }
+  const pause = ({ target: vid }) => {
+    vid.pause()
+    if (audio) {
+      clearInterval(id)
+      audio.pause()
+    }
+  }
 
   if (post.sound) {
     ready = false
