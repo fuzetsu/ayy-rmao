@@ -21,6 +21,7 @@ const LoadMoreComments = () => {
             loading = true
             const childrenToLoad = mc.children.splice(0, COMMENT_LOAD_NUM)
             getMoreComments(state.openPost.name, childrenToLoad).then(data => {
+              m.redraw()
               loading = false
               if (!data.length) return
               console.log('more comments => ', data)

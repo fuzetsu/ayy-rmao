@@ -1,4 +1,4 @@
-import { merge, stream, setupMeiosis } from './ext-deps.js'
+import { merge, stream, meiosis } from './ext-deps.js'
 import { id, safeParse } from './util.js'
 
 import { BORDERS } from './constants.js'
@@ -22,7 +22,7 @@ const app = {
     posts: []
   },
   services: [
-    ({ state }) => {
+    state => {
       localStorage.ayyRmaov1 = JSON.stringify(
         merge(state, {
           openPost: undefined,
@@ -34,7 +34,7 @@ const app = {
   ]
 }
 
-const setup = setupMeiosis({ merge, stream, app })
+const setup = meiosis({ merge, stream, app })
 
 export const { update } = setup
 const { states } = setup

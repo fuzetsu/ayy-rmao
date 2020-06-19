@@ -25,11 +25,11 @@
         "name": "z",
         "exports": []
       },
-      "meiosis-setup@3/mergerino": {
-        "name": "setupMeiosis",
+      "meiosis-setup@5/mergerino": {
+        "name": "meiosis",
         "exports": []
       },
-      "meiosis-setup@3/simple-stream": {
+      "meiosis-setup@5/simple-stream": {
         "name": "stream",
         "exports": []
       }
