@@ -4,7 +4,9 @@ module.exports = {
     es6: true
   },
   extends: ['eslint:recommended', 'plugin:cypress/recommended', 'prettier'],
-  globals: {},
+  globals: {
+    m: true
+  },
   parserOptions: {
     ecmaVersion: 2018,
     sourceType: 'module'

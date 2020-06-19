@@ -1,4 +1,4 @@
-import { m, z } from '../ext-deps.js'
+import { z } from '../ext-deps.js'
 
 import { getComments } from '../api.js'
 import { loadingImg } from '../view-util.js'

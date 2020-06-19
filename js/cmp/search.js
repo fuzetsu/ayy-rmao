@@ -1,4 +1,4 @@
-import { m, z } from '../ext-deps.js'
+import { z } from '../ext-deps.js'
 import { state } from '../index.js'
 import { setSub, setFilter, toggleNsfw, loadPosts } from '../actions.js'
 import Toggle from './toggle.js'

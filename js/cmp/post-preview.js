@@ -1,6 +1,6 @@
 import { toggleExpand, processRedditHtml } from '../util.js'
 import { externalLink } from '../view-util.js'
-import { m, z } from '../ext-deps.js'
+import { z } from '../ext-deps.js'
 import { API_URL, IMAGES } from '../constants.js'
 import PostInfo from './post-info.js'
 
@@ -123,7 +123,7 @@ pl.Loading = {
   oninit(vnode) {
     const args = vnode.attrs
     if (args.post && args.post.parseAsync) {
-      args.post.parseAsync(args.post.url, args.post).then(function(url) {
+      args.post.parseAsync(args.post.url, args.post).then(function (url) {
         args.post.parseAsync = null
         args.post.url = url
         m.redraw()

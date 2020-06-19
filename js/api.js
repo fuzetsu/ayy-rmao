@@ -1,58 +1,34 @@
-import { m } from './ext-deps.js'
 import { API_URL, REQUEST_NUM } from './constants.js'
 
+const get = (url, params) =>
+  m.request({ method: 'get', background: true, url: API_URL + url, params })
+
 export const searchPosts = async (query, sort = true) => {
-  const results = await m
-    .request({
-      method: 'get',
-      background: true,
-      url: `${API_URL}/search.json`,
-      data: {
-        q: query
+  const results = await get('/search.json', { q: query }).then(data =>
+    data.data.children.map(({ data }) => {
+      return {
+        id: data.id,
+        subreddit: data.subreddit,
+        title: data.title,
+        score: data.score,
+        gilded: data.gilded,
+        permalink: data.permalink,
+        name: data.name,
+        num_comments: data.num_comments
       }
     })
-    .then(data =>
-      data.data.children.map(({ data }) => {
-        return {
-          id: data.id,
-          subreddit: data.subreddit,
-          title: data.title,
-          score: data.score,
-          gilded: data.gilded,
-          permalink: data.permalink,
-          name: data.name,
-          num_comments: data.num_comments
-        }
-      })
-    )
+  )
   if (sort) results.sort((a, b) => (a.num_comments > b.num_comments ? -1 : 1))
   return results
 }
 
 export const getComments = (post, comment, sort = 'confidence') =>
-  m
-    .request({
-      method: 'get',
-      background: true,
-      url: API_URL + post.permalink + '.json',
-      data: {
-        comment: comment && comment.id,
-        sort
-      }
-    })
-    .then(data => data[1].data.children)
+  get(post.permalink + '.json', { comment: comment && comment.id, sort }).then(
+    data => data[1].data.children
+  )
 
 export const getMoreComments = (postName, ids) =>
-  m
-    .request({
-      method: 'GET',
-      url: `${API_URL}/api/morechildren.json`,
-      data: {
-        api_type: 'json',
-        children: ids.join(','),
-        link_id: postName
-      }
-    })
+  get('/api/morechildren.json', { api_type: 'json', children: ids.join(','), link_id: postName })
     .then(data => {
       if (
         !data ||
@@ -69,17 +45,11 @@ export const getMoreComments = (postName, ids) =>
     .catch(err => console.log(err))
 
 export const getPosts = (subreddit, after, nsfw) =>
-  m
-    .request({
-      method: 'GET',
-      url: `${API_URL}/r/${subreddit}.json?limit=${REQUEST_NUM}&after=${after}`,
-      background: true
-    })
-    .then(data =>
-      data.data.children
-        .filter(post => nsfw || !post.data.over_18)
-        .map(post => detectPostType(post.data))
-    )
+  get(`/r/${subreddit}.json`, { limit: REQUEST_NUM, after }).then(data =>
+    data.data.children
+      .filter(post => nsfw || !post.data.over_18)
+      .map(post => detectPostType(post.data))
+  )
 
 // the base list of attributes to copy
 const baseAttrs = [

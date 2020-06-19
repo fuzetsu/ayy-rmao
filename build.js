@@ -43,11 +43,29 @@ const buildDeps = deps =>
   ).then(arr => arr.join('\n'))
 
 const pkgJson = require('./package.json') || {}
-const conf = pkgJson.mdeps || {}
 
+const moduleConf = pkgJson.mdeps || {}
 Promise.all(
-  Object.entries(conf).map(async ([file, deps]) => {
+  Object.entries(moduleConf).map(async ([file, deps]) => {
     await fs.writeFile(file, await buildDeps(deps))
-    console.log(file, 'built!', Object.keys(deps))
+    console.log('built module deps', file, Object.keys(deps))
+  })
+)
+
+const scriptConf = pkgJson.sdeps || {}
+Promise.all(
+  Object.entries(scriptConf).map(async ([file, deps]) => {
+    const template = await fs.readFile(file.replace('.html', '.template.html'), 'utf-8')
+    const scripts = await Promise.all(
+      deps.map(path => get(`https://unpkg.com/${path}`).then(res => res.url))
+    )
+    let indentCount = 0
+    let idx = template.indexOf('{{SCRIPTS}}')
+    while (template[--idx] === ' ') indentCount += 1
+    const scriptsHtml = scripts
+      .map(src => `<script src="${src}"></script>`)
+      .join('\n' + Array(indentCount).fill(' ').join(''))
+    await fs.writeFile(file, template.replace('{{SCRIPTS}}', scriptsHtml))
+    console.log('built script deps', file, deps)
   })
 )

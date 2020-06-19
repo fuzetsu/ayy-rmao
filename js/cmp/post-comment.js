@@ -1,4 +1,4 @@
-import { m, z } from '../ext-deps.js'
+import { z } from '../ext-deps.js'
 import { processRedditHtml, prettyTime, reduceCount } from '../util.js'
 import { externalLink } from '../view-util.js'
 
@@ -32,7 +32,7 @@ const PostComment = ({ attrs: { comment } }) => {
   const sep = () => m.trust(' &#x2022; ')
   const refreshComment = cmt => {
     isRefreshing = true
-    getComments(state.openPost, cmt).then(([newCmt]) => {
+    getComments(state.openPost, cmt, state.commentSort).then(([newCmt]) => {
       isRefreshing = false
       if (newCmt && newCmt.data) {
         // normalize comment depth (will always start from 0 so set based on current depth)

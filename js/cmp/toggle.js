@@ -1,4 +1,4 @@
-import { m, z } from '../ext-deps.js'
+import { z } from '../ext-deps.js'
 
 const anim_speed = 200
 

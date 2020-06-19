@@ -1,4 +1,4 @@
-import { m, z } from '../ext-deps.js'
+import { z } from '../ext-deps.js'
 import { pluralize, reduceCount, prettyTime } from '../util.js'
 import { externalLink } from '../view-util.js'
 import { API_URL } from '../constants.js'
@@ -13,7 +13,7 @@ const PostInfo = {
           {
             href: API_URL + post.permalink,
             title: post.subreddit,
-            onclick: function(e) {
+            onclick: function (e) {
               if (e.ctrlKey || readOnly) return
               e.preventDefault()
               setOpen(post)

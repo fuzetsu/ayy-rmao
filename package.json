@@ -17,10 +17,6 @@
   },
   "mdeps": {
     "./js/ext-deps.js": {
-      "mithril@2.0.0-rc.4": {
-        "name": "m",
-        "exports": []
-      },
       "mergerino@0.4": {
         "name": "merge",
         "exports": []
@@ -29,15 +25,20 @@
         "name": "z",
         "exports": []
       },
-      "meiosis-setup@2/mergerino": {
-        "exports": [],
-        "name": "setupMeiosis"
+      "meiosis-setup@3/mergerino": {
+        "name": "setupMeiosis",
+        "exports": []
       },
-      "meiosis-setup@2/simple-stream": {
+      "meiosis-setup@3/simple-stream": {
         "name": "stream",
         "exports": []
       }
     }
+  },
+  "sdeps": {
+    "./index.html": [
+      "mithril@2"
+    ]
   },
   "homepage": "https://github.com/fuzetsu/ayy-rmao#readme",
   "devDependencies": {

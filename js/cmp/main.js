@@ -1,5 +1,5 @@
 import { UNICODE, ADD_MORE_THRESHOLD } from '../constants.js'
-import { m, z } from '../ext-deps.js'
+import { z } from '../ext-deps.js'
 import { throttle, withNoRedraw } from '../util.js'
 import { PostCommentsModal } from './post-comments.js'
 import PostList from './post-list.js'

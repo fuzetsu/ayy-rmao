@@ -1,4 +1,3 @@
-import { m } from '../ext-deps.js'
 import { state } from '../index.js'
 import PostPreview from './post-preview.js'
 
