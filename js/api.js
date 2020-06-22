@@ -102,11 +102,10 @@ const postTypes = [
       '/embed?pub=true&analytics=false'
   },
   {
-    type: 'Video',
-    match: /gfycat\.com\/[a-z0-9]+$/i,
-    strip: true,
-    postParse: true,
-    parse: post => post.preview.reddit_video_preview.fallback_url
+    type: 'Embed',
+    desc: 'Gfycat',
+    match: /gfycat\.com\/[a-z0-9]+/i,
+    parse: url => 'https://gfycat.com/ifr/' + url.match(/com\/([0-9a-z]+)/i)[1]
   },
   {
     type: 'Self',

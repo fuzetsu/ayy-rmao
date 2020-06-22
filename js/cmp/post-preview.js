@@ -78,11 +78,11 @@ pl.Embed = () => {
       return m('.embed-post', [
         loaded
           ? [
-              m('a', { onclick: () => (loaded = false) }, 'close'),
-              m('iframe[frameborder=0]' + z`h 90vh;w 90%`, { src })
+              m('a[href]' + z`d block`, { onclick: () => (loaded = false) }, 'close'),
+              m('iframe[frameborder=0]' + z`d block;margin auto;h 90vh;w 90%`, { src })
             ]
           : m(
-              'button.load-embed' + z`p 10 15;m 7 0`,
+              'button.load-embed' + z`p 10;m 5`,
               { onclick: () => (loaded = true) },
               'Load ',
               post.desc || 'Embedded Content'

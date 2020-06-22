@@ -35,7 +35,7 @@ const PostInfo = {
         m('span', [
           m(
             'a' + z`c #ff5b5b`,
-            { href: '/r/' + post.subreddit, oncreate: m.route.link },
+            { href: '#/r/' + post.subreddit, oncreate: m.route.link },
             post.subreddit
           )
         ]),
