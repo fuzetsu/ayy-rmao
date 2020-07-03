@@ -77,7 +77,7 @@ const postTypes = [
     match: post => post.post_hint === 'hosted:video',
     parse: (post, res) => {
       const url = post.media.reddit_video.fallback_url
-      res.sound = url.split('/').slice(0, -1).concat('audio').join('/')
+      res.sound = url.replace(/DASH[^.]*\./, 'DASH_audio.')
       return url
     }
   },
