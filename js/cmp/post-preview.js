@@ -6,7 +6,7 @@ import PostInfo from './post-info.js'
 
 const pl = {}
 
-pl.Video = ({ attrs: { post } }) => {
+pl.Video = () => {
   let audio = null
   let id
   let error = false
@@ -32,18 +32,15 @@ pl.Video = ({ attrs: { post } }) => {
     }
   }
 
-  if (post.sound) {
-    audio = Object.assign(new Audio(post.sound), {
-      loop: true,
-      value: 0.5,
-      preload: 'metadata',
-      onerror: () => (error = true)
-    })
-  }
-
   return {
     view: ({ attrs: { post } }) =>
       m('.video-post', [
+        post.sound &&
+          m(
+            'audio[loop][preload=metadata]',
+            { oncreate: ({ dom }) => (audio = dom), onerror: () => (error = true) },
+            post.sound.map(src => src && m('source', { src }))
+          ),
         m(
           'video[loop][preload=metadata]' +
             z`cursor row-resize;fade 0.25;max-width 99%;max-height 95vh; :hover { fade 1;z-index 50 }`,
