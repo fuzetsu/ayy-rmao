@@ -9,13 +9,14 @@ const pl = {}
 pl.Video = ({ attrs: { post } }) => {
   let audio = null
   let id
+  let error = false
 
   const play = ({ target: vid }) => {
     vid.play()
-    if (audio) {
+    if (audio && !error) {
       audio.play()
       id = setInterval(() => {
-        if (Math.abs(audio.currentTime - vid.currentTime) < 0.2) return
+        if (error || Math.abs(audio.currentTime - vid.currentTime) < 0.2) return
         audio.currentTime = vid.currentTime
         vid.currentTime = audio.currentTime
         vid.play()
@@ -35,7 +36,8 @@ pl.Video = ({ attrs: { post } }) => {
     audio = Object.assign(new Audio(post.sound), {
       loop: true,
       value: 0.5,
-      preload: 'metadata'
+      preload: 'metadata',
+      onerror: () => (error = true)
     })
   }
 
