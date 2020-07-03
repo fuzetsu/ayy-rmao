@@ -68,6 +68,23 @@ pl.Image = {
 
 pl.Embed = () => {
   let loaded = false
+
+  const closeButton = () =>
+    m(
+      'span.link' + z`d block;m 2`,
+      {
+        onclick: e => {
+          const parent = e.target.parentElement
+          loaded = false
+          setTimeout(() => {
+            const { top } = parent.getBoundingClientRect()
+            if (top < 0 || top > window.innerHeight) parent.scrollIntoView()
+          })
+        }
+      },
+      'close'
+    )
+
   return {
     view: ({ attrs: { post } }) => {
       let src = post.url
@@ -77,8 +94,9 @@ pl.Embed = () => {
       return m('.embed-post', [
         loaded
           ? [
-              m('a[href]' + z`d block`, { onclick: () => (loaded = false) }, 'close'),
-              m('iframe[frameborder=0]' + z`d block;margin auto;h 90vh;w 90%`, { src })
+              closeButton(),
+              m('iframe[frameborder=0]' + z`d block;margin auto;h 90vh;w 90%`, { src }),
+              closeButton()
             ]
           : m(
               'button.load-embed' + z`p 10;m 5`,

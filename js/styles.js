@@ -54,9 +54,10 @@ z.global`
     fs 16
   }
   * { box-sizing border-box }
-  a {
+  a, .link {
     td none
     c $link-color
+    cursor pointer
     :hover { td underline }
   }
   @media only screen and (min-device-width: 900px) {

@@ -120,3 +120,5 @@ export const reduceCount = (count, digits = 1) => {
   // Do not reduce if we are below 1000
   return divisor ? (count / divisor).toFixed(digits) + indicator : count
 }
+
+export const getPath = (obj, path) => path.split('.').reduce((acc, k) => (acc ? acc[k] : null), obj)

@@ -1,4 +1,5 @@
 import { API_URL, REQUEST_NUM } from './constants.js'
+import { getPath } from './util.js'
 
 const get = (url, params) =>
   m.request({ method: 'get', background: true, url: API_URL + url, params })
@@ -29,19 +30,7 @@ export const getComments = (post, comment, sort = 'confidence') =>
 
 export const getMoreComments = (postName, ids) =>
   get('/api/morechildren.json', { api_type: 'json', children: ids.join(','), link_id: postName })
-    .then(data => {
-      if (
-        !data ||
-        !data.json ||
-        !data.json.data ||
-        !data.json.data.things ||
-        data.json.data.things.length <= 0
-      ) {
-        console.log('no comments to load :(', data && data.json && data.json.errors)
-        return []
-      }
-      return data.json.data.things
-    })
+    .then(data => getPath(data, 'json.data.things') || [])
     .catch(err => console.log(err))
 
 export const getPosts = (subreddit, after, nsfw) =>
