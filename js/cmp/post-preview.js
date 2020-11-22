@@ -4,9 +4,9 @@ import { z } from '../ext-deps.js'
 import { API_URL, IMAGES } from '../constants.js'
 import PostInfo from './post-info.js'
 
-const pl = {}
+const Preview = {}
 
-pl.Video = () => {
+Preview.Video = () => {
   let audio = null
   let id
   let error = false
@@ -38,8 +38,8 @@ pl.Video = () => {
         post.sound &&
           m(
             'audio[loop][preload=metadata]',
-            { oncreate: ({ dom }) => (audio = dom), onerror: () => (error = true) },
-            post.sound.map(src => src && m('source', { src }))
+            { oncreate: ({ dom }) => (audio = dom) },
+            post.sound.map(src => src && m('source', { src, onerror: () => (error = true) }))
           ),
         m(
           'video[loop][preload=metadata]' +
@@ -55,7 +55,7 @@ pl.Video = () => {
   }
 }
 
-pl.Image = {
+Preview.Image = {
   view: ({ attrs: { post } }) =>
     m(
       '.image-post',
@@ -66,7 +66,7 @@ pl.Image = {
     )
 }
 
-pl.Embed = () => {
+Preview.Embed = () => {
   let loaded = false
 
   const closeButton = () =>
@@ -131,14 +131,14 @@ const SelfPost = {
     )
 }
 
-pl.Self = ({ attrs: { post } }) => {
+Preview.Self = ({ attrs: { post } }) => {
   const selfTextHtml = post.selftext_html && m.trust(processRedditHtml(post.selftext_html))
   return {
     view: ({ attrs: { post } }) => m(SelfPost, { post }, selfTextHtml || post.title)
   }
 }
 
-pl.Link = {
+Preview.Link = {
   view: ({ attrs: { post } }) =>
     m(
       SelfPost,
@@ -151,7 +151,7 @@ pl.Link = {
     )
 }
 
-pl.Loading = {
+Preview.Loading = {
   oninit(vnode) {
     const args = vnode.attrs
     if (args.post && args.post.parseAsync) {
@@ -169,10 +169,10 @@ pl.Loading = {
 
 const PostPreview = {
   view({ attrs: { post, showInfo = true } }) {
-    const comp = pl[post.type]
+    const comp = Preview[post.type]
     return m('.post-preview' + z`m 5 auto 40 auto`, [
       showInfo ? m(PostInfo, { post }) : '',
-      post.parseAsync ? m(pl.Loading, { post }) : m(comp, { post })
+      post.parseAsync ? m(Preview.Loading, { post }) : m(comp, { post })
     ])
   }
 }
