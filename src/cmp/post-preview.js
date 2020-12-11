@@ -6,17 +6,16 @@ import PostInfo from './post-info'
 
 const Preview = {}
 
-Preview.Video = () => {
+Preview.Video = ({ attrs: { post } }) => {
   let audio = null
   let id
-  let error = false
 
   const play = ({ target: vid }) => {
     vid.play()
-    if (audio && !error) {
+    if (audio && !hasAudioError()) {
       audio.play()
       id = setInterval(() => {
-        if (error || Math.abs(audio.currentTime - vid.currentTime) < 0.2) return
+        if (hasAudioError() || Math.abs(audio.currentTime - vid.currentTime) < 0.2) return
         audio.currentTime = vid.currentTime
         vid.currentTime = audio.currentTime
         vid.play()
@@ -32,7 +31,11 @@ Preview.Video = () => {
     }
   }
 
+  const errors = []
+  const hasAudioError = () => post.sound && errors.filter(Boolean).length >= post.sound.length
+
   return {
+    onremove: () => clearInterval(id),
     view: ({ attrs: { post } }) =>
       m('.video-post', [
         post.sound &&
@@ -40,9 +43,12 @@ Preview.Video = () => {
             'audio[loop][preload=metadata]',
             { oncreate: ({ dom }) => (audio = dom) },
             post.sound.map(
-              src =>
+              (src, idx) =>
                 src &&
-                m('source', { src, onload: () => (error = false), onerror: () => (error = true) })
+                m('source', {
+                  src,
+                  onerror: () => (errors[idx] = true)
+                })
             )
           ),
         m(
