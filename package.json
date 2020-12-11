@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "parcel src/index.html --open",
     "build": "parcel build src/index.html --experimental-scope-hoisting",
+    "build:gh": "parcel build src/index.html --experimental-scope-hoisting --public-url ./",
     "prebuild": "rm -rf dist",
     "test": "cypress open"
   },

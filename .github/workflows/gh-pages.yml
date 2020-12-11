@@ -29,7 +29,7 @@ jobs:
             ${{ runner.os }}-yarn-
 
       - run: yarn
-      - run: yarn build
+      - run: yarn build:gh
 
       - name: Deploy
         uses: peaceiris/actions-gh-pages@v3
