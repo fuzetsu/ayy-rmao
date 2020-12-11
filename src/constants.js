@@ -1,4 +1,4 @@
-export const API_URL = 'http://127.0.0.1:8080/https://www.reddit.com'
+export const API_URL = 'https://www.reddit.com'
 
 export const IMAGES = {
   loading: 'img/loading.gif'
