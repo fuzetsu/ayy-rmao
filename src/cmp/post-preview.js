@@ -39,7 +39,11 @@ Preview.Video = () => {
           m(
             'audio[loop][preload=metadata]',
             { oncreate: ({ dom }) => (audio = dom) },
-            post.sound.map(src => src && m('source', { src, onerror: () => (error = true) }))
+            post.sound.map(
+              src =>
+                src &&
+                m('source', { src, onload: () => (error = false), onerror: () => (error = true) })
+            )
           ),
         m(
           'video[loop][preload=metadata]' +
