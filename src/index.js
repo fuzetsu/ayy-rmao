@@ -1,6 +1,6 @@
 import merge from 'mergerino'
 import meiosis from 'meiosis-setup/mergerino'
-import { stream } from 'meiosis-setup/simple-stream'
+import stream from 'meiosis-setup/simple-stream'
 import { id, safeParse } from '/lib/util'
 import { m } from '/vdom'
 
