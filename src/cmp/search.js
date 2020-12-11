@@ -1,7 +1,8 @@
-import { z } from '../ext-deps.js'
-import { state } from '../index.js'
-import { setSub, setFilter, toggleNsfw, loadPosts } from '../actions.js'
-import Toggle from './toggle.js'
+import { z, m } from '/vdom'
+import { state } from '/'
+import { setSub, setFilter, toggleNsfw, loadPosts } from '/actions'
+
+import Toggle from './toggle'
 
 export default function Search() {
   const handleEnter = e => {

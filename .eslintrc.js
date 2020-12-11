@@ -1,16 +1,26 @@
 module.exports = {
   env: {
     browser: true,
-    es6: true
+    es6: true,
+    node: true
   },
-  extends: ['eslint:recommended', 'plugin:cypress/recommended', 'prettier'],
-  globals: {
-    m: true
+  settings: {
+    'import/resolver': { parcel: { rootDir: 'src' } }
   },
+  extends: [
+    'eslint:recommended',
+    'plugin:cypress/recommended',
+    'plugin:import/errors',
+    'plugin:import/warnings'
+  ],
+  globals: {},
   parserOptions: {
     ecmaVersion: 2018,
     sourceType: 'module'
   },
   plugins: [],
-  rules: {}
+  rules: {
+    'import/no-unresolved': ['error', { ignore: ['^http'] }],
+    'import/order': 'error'
+  }
 }

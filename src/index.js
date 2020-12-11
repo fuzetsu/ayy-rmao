@@ -1,11 +1,14 @@
-import { merge, stream, meiosis } from './ext-deps.js'
-import { id, safeParse } from './util.js'
+import merge from 'mergerino'
+import meiosis from 'meiosis-setup/mergerino'
+import stream from 'meiosis-setup/simple-stream'
+import { id, safeParse } from '/lib/util'
+import { m } from '/vdom'
 
-import { BORDERS } from './constants.js'
+import { BORDERS } from '/constants'
 
-import Main from './cmp/main.js'
+import Main from '/cmp/main'
 
-import { setNightTheme } from './actions.js'
+import { setNightTheme } from '/actions'
 
 const app = {
   initial: {

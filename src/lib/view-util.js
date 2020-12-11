@@ -1,5 +1,5 @@
-import { z } from './ext-deps.js'
-import { LOADING_IMG } from './constants.js'
+import { m, z } from '/vdom'
+import LOADING_IMG from '/img/loading.gif'
 
 export const loadingImg = () => m('img' + z`filter invert($loading-filter)`, { src: LOADING_IMG })
 

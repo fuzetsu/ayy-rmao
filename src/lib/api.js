@@ -1,5 +1,6 @@
-import { API_URL, REQUEST_NUM } from './constants.js'
-import { getPath } from './util.js'
+import { m } from '/vdom'
+import { API_URL, REQUEST_NUM } from '/constants'
+import { getPath } from '/lib/util'
 
 const get = (url, params) =>
   m.request({ method: 'get', background: true, url: API_URL + url, params })

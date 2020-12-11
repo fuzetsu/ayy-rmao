@@ -1,4 +1,5 @@
-import { state } from '../index.js'
+import { m } from '/vdom'
+import { state } from '/'
 import PostPreview from './post-preview.js'
 
 const PostList = {

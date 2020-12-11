@@ -1,9 +1,9 @@
-import { z } from '../ext-deps.js'
-import { COMMENT_LOAD_NUM } from '../constants.js'
-import { state } from '../index.js'
-import { pluralize } from '../util.js'
-import { loadingImg } from '../view-util.js'
-import { getMoreComments } from '../api.js'
+import { z, m } from '/vdom'
+import { COMMENT_LOAD_NUM } from '/constants'
+import { state } from '/'
+import { pluralize } from '/lib/util'
+import { loadingImg } from '/lib/view-util'
+import { getMoreComments } from '/lib/api.js'
 
 const LoadMoreComments = () => {
   let loading = false

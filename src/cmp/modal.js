@@ -1,4 +1,4 @@
-import { z } from '../ext-deps.js'
+import { z, m } from '/vdom'
 
 const Modal = {
   view: ({ attrs: { onclose, header, content } }) =>

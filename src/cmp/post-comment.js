@@ -1,10 +1,10 @@
-import { z } from '../ext-deps.js'
-import { processRedditHtml, prettyTime, reduceCount } from '../util.js'
-import { externalLink } from '../view-util.js'
+import { z, m } from '/vdom'
+import { processRedditHtml, prettyTime, reduceCount } from '/lib/util'
+import { externalLink } from '/lib/view-util'
+import { getComments } from '/lib/api'
 
-import { getComments } from '../api.js'
-import { API_URL } from '../constants.js'
-import { state } from '../index.js'
+import { API_URL } from '/constants'
+import { state } from '/'
 
 import LoadMoreComments from './load-more-comments.js'
 

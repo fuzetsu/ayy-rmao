@@ -4,7 +4,10 @@
   "description": "simple media focused reddit client",
   "main": "js/index.js",
   "scripts": {
-    "build": "node build.js"
+    "dev": "parcel src/index.html --open",
+    "build": "parcel build src/index.html --experimental-scope-hoisting",
+    "prebuild": "rm -rf dist",
+    "test": "cypress open"
   },
   "repository": {
     "type": "git",
@@ -15,35 +18,25 @@
   "bugs": {
     "url": "https://github.com/fuzetsu/ayy-rmao/issues"
   },
-  "mdeps": {
-    "./js/ext-deps.js": {
-      "mergerino@0.4": {
-        "name": "merge",
-        "exports": []
-      },
-      "zaftig@0.9": {
-        "name": "z",
-        "exports": []
-      },
-      "meiosis-setup@5/mergerino": {
-        "name": "meiosis",
-        "exports": []
-      },
-      "meiosis-setup@5/simple-stream": {
-        "name": "stream",
-        "exports": []
-      }
-    }
-  },
-  "sdeps": {
-    "./index.html": [
-      "mithril@2"
-    ]
-  },
   "homepage": "https://github.com/fuzetsu/ayy-rmao#readme",
+  "dependencies": {
+    "meiosis-setup": "^5.0.0",
+    "mergerino": "^0.4.0",
+    "mithril": "^2.0.4",
+    "zaftig": "^0.9.2"
+  },
   "devDependencies": {
-    "cypress": "^4.3.0",
-    "eslint-config-prettier": "^6.10.1",
-    "eslint-plugin-cypress": "^2.10.3"
-  }
+    "cypress": "^5",
+    "eslint": "^7.14.0",
+    "eslint-import-resolver-parcel": "^1.10.5",
+    "eslint-plugin-cypress": "^2.10.3",
+    "eslint-plugin-import": "^2.22.1",
+    "parcel-bundler": "^1.12.4",
+    "parcel-plugin-bundle-visualiser": "^1.2.0"
+  },
+  "browserslist": [
+    "> 0.4%",
+    "not ie > 0",
+    "not op_mini all"
+  ]
 }

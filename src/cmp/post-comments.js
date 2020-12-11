@@ -1,16 +1,15 @@
-import { z } from '../ext-deps.js'
-
-import { getComments } from '../api.js'
-import { loadingImg } from '../view-util.js'
+import { z, m } from '/vdom'
+import { getComments } from '/lib/api.js'
+import { loadingImg } from '/lib/view-util.js'
+import { state } from '/'
+import { setOpen, setCommentSort } from '/actions'
+import { SortingOptions } from '/constants'
 
 import Modal from './modal.js'
 import PostInfo from './post-info.js'
 import PostComment from './post-comment.js'
 import LoadMoreComments from './load-more-comments.js'
 import PostPreview from './post-preview.js'
-import { state } from '../index.js'
-import { setOpen, setCommentSort } from '../actions.js'
-import { SortingOptions } from '../constants.js'
 
 const PostComments = ({ attrs: { post } }) => {
   let comments = []

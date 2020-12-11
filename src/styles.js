@@ -1,4 +1,4 @@
-import { z } from './ext-deps.js'
+import { z } from '/vdom'
 
 const dayMode = `
   $loading-filter 1

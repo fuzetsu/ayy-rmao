@@ -1,8 +1,8 @@
-import { toggleExpand, processRedditHtml } from '../util.js'
-import { externalLink } from '../view-util.js'
-import { z } from '../ext-deps.js'
-import { API_URL, IMAGES } from '../constants.js'
-import PostInfo from './post-info.js'
+import { m, z } from '/vdom'
+import { toggleExpand, processRedditHtml } from '/lib/util'
+import { externalLink } from '/lib/view-util'
+import { API_URL, IMAGES } from '/constants'
+import PostInfo from './post-info'
 
 const Preview = {}
 

@@ -1,7 +1,7 @@
-import { setNight } from './styles.js'
-import { BORDERS, FIRST_LOAD_NUM, LOAD_NUM } from './constants.js'
-import { update, state } from './index.js'
-import { getPosts } from './api.js'
+import { setNight } from '/styles'
+import { BORDERS, FIRST_LOAD_NUM, LOAD_NUM } from '/constants'
+import { update, state } from '/'
+import { getPosts } from '/lib/api'
 
 export const setNightTheme = flag =>
   update((state, m) => {

@@ -1,10 +1,11 @@
-import { UNICODE, ADD_MORE_THRESHOLD } from '../constants.js'
-import { z } from '../ext-deps.js'
-import { throttle, withNoRedraw } from '../util.js'
-import { PostCommentsModal } from './post-comments.js'
+import { z, m } from '/vdom'
+import { UNICODE, ADD_MORE_THRESHOLD } from '/constants'
+import { throttle, withNoRedraw } from '/lib/util'
+import { loadingImg } from '/lib/view-util'
+
+import { PostCommentsModal } from './post-comments'
 import PostList from './post-list.js'
 import Search from './search.js'
-import { loadingImg } from '../view-util.js'
 
 import { state } from '../index.js'
 import { setNightTheme, loadPosts, resetPosts, increaseLimit } from '../actions.js'
