@@ -68,8 +68,8 @@ const postTypes = [
     parse: (post, res) => {
       const url = post.media.reddit_video.fallback_url
       res.sound = [
-        url.split('/').slice(0, -1).join('/') + '/audio',
-        url.replace(/DASH[^.]*\./, 'DASH_audio.')
+        url.replace(/DASH[^.]*\./, 'DASH_audio.'),
+        url.split('/').slice(0, -1).join('/') + '/audio'
       ]
       return url
     }
