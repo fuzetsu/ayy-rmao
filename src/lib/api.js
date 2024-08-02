@@ -68,7 +68,7 @@ const postTypes = [
     parse: (post, res) => {
       const url = post.media.reddit_video.fallback_url
       res.sound = [
-        url.replace(/DASH[^.]*\./, 'DASH_audio.'),
+        url.replace(/DASH[^.]*\./, 'DASH_AUDIO_128.'),
         url.split('/').slice(0, -1).join('/') + '/audio'
       ]
       return url
@@ -123,8 +123,8 @@ const detectPostType = function (post) {
       cleanPost.url = type.parse
         ? type.parse(type.postParse ? post : type.strip === false ? post.url : url, cleanPost)
         : type.strip
-        ? url
-        : post.url
+          ? url
+          : post.url
       return true
     }
   })

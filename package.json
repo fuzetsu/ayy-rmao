@@ -23,7 +23,7 @@
   "dependencies": {
     "meiosis-setup": "^5.0.0",
     "mergerino": "^0.4.0",
-    "mithril": "^2.0.4",
+    "mithril": "^2.2.2",
     "zaftig": "^0.10.0"
   },
   "devDependencies": {
