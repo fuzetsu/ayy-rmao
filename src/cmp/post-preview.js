@@ -76,6 +76,38 @@ Preview.Image = {
     )
 }
 
+Preview.Gallery = () => {
+  let index = 0
+  const next = () => index++
+  const prev = () => index--
+  const btnStyle = z`
+    position absolute
+    top 50%
+    background none
+    border 1px solid white
+    opacity 0.3
+    font-size 150%
+    border-radius 6px
+    padding 10px
+    color white
+    cursor pointer
+    transition opacity 0.3s
+  `
+  return {
+    view: ({ attrs: { post } }) => {
+      if (index >= post.images.length) index = 0
+      else if (index < 0) index = post.images.length - 1
+      return m(
+        '' +
+          z`position relative;d inline-block;&:hover .${btnStyle} { opacity 1; background rgba(0, 0, 0, 0.5) }`,
+        m('button' + btnStyle + z`left 20`, { onclick: prev }, '<'),
+        m('button' + btnStyle + z`right 20`, { onclick: next }, '>'),
+        m(Preview.Image, { post: { url: post.images[index] } })
+      )
+    }
+  }
+}
+
 Preview.Embed = () => {
   let loaded = false
 

@@ -55,16 +55,11 @@ const baseAttrs = [
 
 // array of post types, how to match, and how to display them
 const postTypes = [
-  { type: 'Video', match: /\.(webm|mp4)$/i },
-  {
-    type: 'Video',
-    match: /imgur.+\.(gif|gifv)$/i,
-    parse: url => url.replace(/\.[^.]+$/, '.mp4')
-  },
+  { type: 'Image', match: post => post.post_hint === 'image' },
   {
     type: 'Video',
     postParse: true,
-    match: post => post.post_hint === 'hosted:video',
+    match: post => Boolean(post.media.reddit_video.fallback_url),
     parse: (post, res) => {
       const url = post.media.reddit_video.fallback_url
       res.sound = [
@@ -75,16 +70,13 @@ const postTypes = [
     }
   },
   {
-    type: 'Image',
-    match: /reddituploads/i,
-    strip: false,
-    parse: url => url.replace(/&amp;/gi, '&')
-  },
-  { type: 'Image', match: /\.(jpg|png|gif)$/i },
-  {
-    type: 'Image',
-    match: /imgur\.com\/[a-z0-9]+$/i,
-    parse: url => `http://i.imgur.com/${url.match(/([^/]+)$/)[0]}.gif`
+    type: 'Gallery',
+    match: post => post.media_metadata && post.url.includes('reddit.com/gallery'),
+    postParse: true,
+    parse: (post, res) => {
+      res.images = Object.values(post.media_metadata).map(data => data.s.u.replace('preview', 'i'))
+      return post.url
+    }
   },
   {
     type: 'Embed',
@@ -93,12 +85,6 @@ const postTypes = [
     parse: url =>
       url.replace(/\/gallery\//, '/a/').replace(/^http:/, 'https:') +
       '/embed?pub=true&analytics=false'
-  },
-  {
-    type: 'Embed',
-    desc: 'Gfycat',
-    match: /gfycat\.com\/[a-z0-9]+/i,
-    parse: url => 'https://gfycat.com/ifr/' + url.match(/com\/([0-9a-z]+)/i)[1]
   },
   {
     type: 'Self',
