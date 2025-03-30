@@ -1,6 +1,6 @@
-import { z, m } from '/vdom'
-import { state } from '/'
-import { setSub, setFilter, toggleNsfw, loadPosts } from '/actions'
+import { z, m } from '@/vdom'
+import { state } from '@/index'
+import { setSub, setFilter, toggleNsfw, loadPosts } from '@/actions'
 
 import Toggle from './toggle'
 

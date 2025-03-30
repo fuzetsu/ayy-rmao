@@ -1,14 +1,14 @@
 import merge from 'mergerino'
 import meiosis from 'meiosis-setup/mergerino'
 import stream from 'meiosis-setup/simple-stream'
-import { id, safeParse } from '/lib/util'
-import { m } from '/vdom'
+import { id, safeParse } from '@/lib/util'
+import { m } from '@/vdom'
 
-import { BORDERS } from '/constants'
+import { BORDERS } from '@/constants'
 
-import Main from '/cmp/main'
+import Main from '@/cmp/main'
 
-import { setNightTheme } from '/actions'
+import { setNightTheme } from '@/actions'
 
 const app = {
   initial: {

@@ -1,7 +1,7 @@
-import { m, z } from '/vdom'
-import { toggleExpand, processRedditHtml } from '/lib/util'
-import { externalLink } from '/lib/view-util'
-import { API_URL, IMAGES } from '/constants'
+import { m, z } from '@/vdom'
+import { toggleExpand, processRedditHtml } from '@/lib/util'
+import { externalLink } from '@/lib/view-util'
+import { API_URL, IMAGES } from '@/constants'
 import PostInfo from './post-info'
 
 const Preview = {}

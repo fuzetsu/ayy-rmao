@@ -1,4 +1,4 @@
-import { z } from '/vdom'
+import { z } from '@/vdom'
 
 const dayMode = `
   $loading-filter 1

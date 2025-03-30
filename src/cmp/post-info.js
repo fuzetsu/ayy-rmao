@@ -1,8 +1,8 @@
-import { pluralize, reduceCount, prettyTime } from '/lib/util'
-import { m, z } from '/vdom'
-import { externalLink } from '/lib/view-util'
-import { API_URL } from '/constants'
-import { setOpen } from '/actions'
+import { pluralize, reduceCount, prettyTime } from '@/lib/util'
+import { m, z } from '@/vdom'
+import { externalLink } from '@/lib/view-util'
+import { API_URL } from '@/constants'
+import { setOpen } from '@/actions'
 
 const PostInfo = {
   view: ({ attrs: { post, readOnly = false } }) =>

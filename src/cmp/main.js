@@ -1,7 +1,7 @@
-import { z, m } from '/vdom'
-import { UNICODE, ADD_MORE_THRESHOLD } from '/constants'
-import { throttle, withNoRedraw } from '/lib/util'
-import { loadingImg } from '/lib/view-util'
+import { z, m } from '@/vdom'
+import { UNICODE, ADD_MORE_THRESHOLD } from '@/constants'
+import { throttle, withNoRedraw } from '@/lib/util'
+import { loadingImg } from '@/lib/view-util'
 
 import { PostCommentsModal } from './post-comments'
 import PostList from './post-list.js'
@@ -74,8 +74,8 @@ const Main = () => {
               failed
                 ? 'Failed to load subreddit. Please check name and try again.'
                 : !subreddit
-                ? 'Please enter a subreddit and press enter.'
-                : ''
+                  ? 'Please enter a subreddit and press enter.'
+                  : ''
             )
           ),
           openPost ? m(PostCommentsModal) : '',

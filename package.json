@@ -4,11 +4,9 @@
   "description": "simple media focused reddit client",
   "main": "js/index.js",
   "scripts": {
-    "dev": "parcel src/index.html --open",
-    "build": "parcel build src/index.html",
-    "build:gh": "parcel build src/index.html --public-url ./",
-    "prebuild": "rm -rf dist",
-    "test": "cypress open"
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
   },
   "repository": {
     "type": "git",
@@ -27,13 +25,8 @@
     "zaftig": "^0.10.0"
   },
   "devDependencies": {
-    "cypress": "^5",
-    "eslint": "^7.14.0",
-    "eslint-import-resolver-parcel": "^1.10.5",
-    "eslint-plugin-cypress": "^2.10.3",
-    "eslint-plugin-import": "^2.22.1",
-    "parcel-bundler": "^1.12.4",
-    "parcel-plugin-bundle-visualiser": "^1.2.0"
+    "vite": "^6.2.3",
+    "vite-tsconfig-paths": "^5.1.4"
   },
   "browserslist": [
     "> 0.4%",

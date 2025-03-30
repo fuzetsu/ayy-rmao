@@ -1,4 +1,4 @@
-import { z, m } from '/vdom'
+import { z, m } from '@/vdom'
 
 const Modal = {
   view: ({ attrs: { onclose, header, content } }) =>

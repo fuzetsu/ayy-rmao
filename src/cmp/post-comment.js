@@ -1,10 +1,10 @@
-import { z, m } from '/vdom'
-import { processRedditHtml, prettyTime, reduceCount } from '/lib/util'
-import { externalLink } from '/lib/view-util'
-import { getComments } from '/lib/api'
+import { z, m } from '@/vdom'
+import { processRedditHtml, prettyTime, reduceCount } from '@/lib/util'
+import { externalLink } from '@/lib/view-util'
+import { getComments } from '@/lib/api'
 
-import { API_URL } from '/constants'
-import { state } from '/'
+import { API_URL } from '@/constants'
+import { state } from '@/index'
 
 import LoadMoreComments from './load-more-comments.js'
 
