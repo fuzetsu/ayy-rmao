@@ -53,15 +53,20 @@ const baseAttrs = [
   'created_utc'
 ]
 
+const tryGetMediaUrl = post => {
+  const media = post.media?.reddit_video || post.preview?.reddit_video_preview
+  return media?.fallback_url
+}
+
 // array of post types, how to match, and how to display them
 const postTypes = [
   { type: 'Image', match: post => post.post_hint === 'image' },
   {
     type: 'Video',
     postParse: true,
-    match: post => Boolean(post.media.reddit_video.fallback_url),
+    match: post => tryGetMediaUrl(post),
     parse: (post, res) => {
-      const url = post.media.reddit_video.fallback_url
+      const url = tryGetMediaUrl(post)
       res.sound = [
         url.replace(/DASH[^.]*\./, 'DASH_AUDIO_128.'),
         url.split('/').slice(0, -1).join('/') + '/audio'
