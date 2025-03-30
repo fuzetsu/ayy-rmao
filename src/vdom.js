@@ -1,5 +1,5 @@
 import z from 'zaftig'
-z.setDebug(process.env.NODE_ENV === 'development')
+z.setDebug(import.meta.env.NODE_ENV === 'development')
 export { z }
 
 export { default as m } from 'mithril'

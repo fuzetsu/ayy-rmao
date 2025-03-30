@@ -96,12 +96,15 @@ export const anim = (dom, cb, type = 'end', unbind = true) => {
   dom.addEventListener('animation' + type, handler)
 }
 
-export const doWith = (...args) => fn => fn(...args)
+export const doWith =
+  (...args) =>
+  fn =>
+    fn(...args)
 
 export const safeParse = (json, fallback = {}) => {
   try {
     return JSON.parse(json)
-  } catch (e) {
+  } catch (_e) {
     return fallback
   }
 }
