@@ -3,7 +3,7 @@ import { COMMENT_LOAD_NUM } from '@/constants'
 import { state } from '@/index'
 import { pluralize } from '@/lib/util'
 import { loadingImg } from '@/lib/view-util'
-import { getMoreComments } from '@/lib/api.js'
+import { getMoreComments } from '@/lib/api'
 
 const LoadMoreComments = () => {
   let loading = false

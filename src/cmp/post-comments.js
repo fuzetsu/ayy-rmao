@@ -1,15 +1,15 @@
 import { z, m } from '@/vdom'
-import { getComments } from '@/lib/api.js'
-import { loadingImg } from '@/lib/view-util.js'
+import { getComments } from '@/lib/api'
+import { loadingImg } from '@/lib/view-util'
 import { state } from '@/index'
 import { setOpen, setCommentSort } from '@/actions'
 import { SortingOptions } from '@/constants'
 
-import Modal from './modal.js'
-import PostInfo from './post-info.js'
-import PostComment from './post-comment.js'
-import LoadMoreComments from './load-more-comments.js'
-import PostPreview from './post-preview.js'
+import Modal from './modal'
+import PostInfo from './post-info'
+import PostComment from './post-comment'
+import LoadMoreComments from './load-more-comments'
+import PostPreview from './post-preview'
 
 const PostComments = ({ attrs: { post } }) => {
   let comments = []

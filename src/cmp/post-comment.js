@@ -6,7 +6,7 @@ import { getComments } from '@/lib/api'
 import { API_URL } from '@/constants'
 import { state } from '@/index'
 
-import LoadMoreComments from './load-more-comments.js'
+import LoadMoreComments from './load-more-comments'
 
 const commentContents = z`
   word-break break-word

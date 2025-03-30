@@ -4,11 +4,11 @@ import { throttle, withNoRedraw } from '@/lib/util'
 import { loadingImg } from '@/lib/view-util'
 
 import { PostCommentsModal } from './post-comments'
-import PostList from './post-list.js'
-import Search from './search.js'
+import PostList from './post-list'
+import Search from './search'
 
-import { state } from '../index.js'
-import { setNightTheme, loadPosts, resetPosts, increaseLimit } from '../actions.js'
+import { state } from '../index'
+import { setNightTheme, loadPosts, resetPosts, increaseLimit } from '../actions'
 
 const Main = () => {
   let atPageTop = true

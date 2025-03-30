@@ -1,6 +1,6 @@
 import { m } from '@/vdom'
 import { state } from '@/index'
-import PostPreview from './post-preview.js'
+import PostPreview from './post-preview'
 
 const PostList = {
   view: ({ attrs: { posts } }) =>
