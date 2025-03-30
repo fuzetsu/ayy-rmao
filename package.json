@@ -27,10 +27,5 @@
   "devDependencies": {
     "vite": "^6.2.3",
     "vite-tsconfig-paths": "^5.1.4"
-  },
-  "browserslist": [
-    "> 0.4%",
-    "not ie > 0",
-    "not op_mini all"
-  ]
+  }
 }
