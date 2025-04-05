@@ -1,3 +1,3 @@
 # Ayy RMAO! (Reddit my ass off)
 
-A simple image driven view of Reddit. [Check it out!](http://fuzetsu.github.com/ayy-rmao).
+An infinite scrolling media focused reddit web client. [Check it out!](https://fuzetsu.github.io/ayy-rmao)
