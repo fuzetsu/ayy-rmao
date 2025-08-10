@@ -79,7 +79,9 @@ const postTypes = [
     match: post => post.media_metadata && post.url.includes('reddit.com/gallery'),
     postParse: true,
     parse: (post, res) => {
-      res.images = Object.values(post.media_metadata).map(data => data.s.u.replace('preview', 'i'))
+      res.images = Object.values(post.media_metadata)
+        .map(data => data.s.u?.replace('preview', 'i') ?? data.s.gif)
+        .filter(Boolean)
       return post.url
     }
   },
